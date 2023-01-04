@@ -1,0 +1,4 @@
+{
+    "plugins": ["nonebot_plugin_cocdicer","nonebot_plugin_arcaeabot"],
+    "plugin_dirs": ["src/plugins"]
+}
