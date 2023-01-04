@@ -3,7 +3,7 @@
 # StarBot-AGLAS v2.0.1
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
-基于 Kiba & MaiBot 项目开发的 NoneBot 框架的多功能音游 BOT，
+基于 Kiba & MaiBot 项目开发的 NoneBot 框架的多功能音游 Bot，
 版本 v2.0.1 Beta 0.93
 <!-- prettier-ignore-end -->
 
@@ -23,6 +23,8 @@ StarBot-AGLAS 项目是基于 Mai-Bot 与 Kiba 项目融合改造创建的适用
 在此感谢 Diving-Fish 的 Mai-Bot / Chiyuki 开源项目以及 Killua 的 Kiba 开源项目。
 
 接下来，本手册为您提供对StarBot最基础的配置教程与支持。更多内容请阅读Wiki。
+
+有关StarBot-AGLAS的更新内容，请参阅[更新日志](https://github.com/Rinfair-CSP-A016/StarBot-AGLAS/blob/master/CHANGELOG.md)。
 
 ## Step 1. 安装 Python
 
@@ -72,6 +74,7 @@ python bot.py
 ## Step 4. 连接 CQ-HTTP
 
 前往 https://github.com/Mrs4s/go-cqhttp > Releases，下载适合自己操作系统的可执行文件。
+
 go-cqhttp 在初次启动时会询问代理方式，选择反向 websocket 代理即可。
 
 之后用任何文本编辑器打开`config.yml`文件，设置反向 ws 地址、上报方式：
@@ -89,7 +92,9 @@ servers:
 ```
 08-02 11:50:51 [INFO] nonebot | WebSocket Connection from CQHTTP Bot 114514 Accepted!
 ```
-至此，您可以和对应的 QQ 号聊天并使用 mai bot 的所有功能了。
+至此，您可以和对应的 QQ 号聊天并使用 StarBot-AGLAS 的所有功能了。
+
+**注：自v2.0.1 Beta 0.93起，由于StarBot-AGLAS使用nonebot-plugin-arcaeabot，您需要申请ArcaeaUnlimitedAPI的apiurl以及token才能使用arcaea模块的相关功能，具体请参考[nonebot-plugin-arcaeabot](https://github.com/SEAFHMC/nonebot-plugin-arcaeabot)的相关文档**
 
 ## FAQ
 
@@ -106,7 +111,7 @@ servers:
 > maimai查询方案由Killua设计，您可以自主使用PhotoShop等修图软件更改此样式。但请保留"Powered by Killua"字样。
 
 我有其他问题？
-> 欢迎在本仓库下提出issue，Rinfair会在第一时间回复您。
+> 若本仓库Wiki不能给你有关帮助，欢迎提出issue，我会尽快回应。
 
 ## 帮助与说明
 
@@ -143,6 +148,6 @@ b40 / b50 | 根据[查分器](https://www.diving-fish.com/maimaidx/prober/)数�
 ## License
 
 
-使用此软件代码须遵守 “MIT 协议” 。
+使用此软件代码须遵守 MIT License 。
 
-您可以自由使用本项目的代码用于商业或非商业的用途，但必须附带 MIT 协议。
+您可以自由使用本项目的代码用于商业或非商业的用途，但必须附带MIT License。
