@@ -1,6 +1,8 @@
 <div align="center">
 
 # StarBot-AGLAS v2.0.1
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FStarBot-AGLAS.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FStarBot-AGLAS?ref=badge_shield)
+
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
 基于 Kiba & MaiBot 项目开发的 NoneBot 框架的多功能音游 Bot，
@@ -13,6 +15,9 @@
   </a>
 
 <div align="left">
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FStarBot-AGLAS.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FStarBot-AGLAS?ref=badge_large)
 
 ## 欢迎使用
 
