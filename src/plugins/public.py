@@ -11,6 +11,7 @@ from src.libraries.image import *
 from random import randint
 import asyncio
 from nonebot.adapters.onebot.v11 import Message, MessageSegment, GroupMessageEvent, PrivateMessageEvent
+from nonebot_plugin_guild_patch import GuildMessageEvent
 
 from nonebot.rule import to_me
 from src.libraries.image import image_to_base64, path, draw_text, get_jlpx, text_to_image
