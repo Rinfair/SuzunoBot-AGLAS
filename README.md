@@ -4,13 +4,17 @@
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line MD036 -->
 基于 Kiba & MaiBot 项目开发的 NoneBot 框架的多功能音游 Bot，
-版本 v2.0.1 Beta 0.93
+版本 v2.0.1 Beta 0.95
 <!-- prettier-ignore-end -->
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/Rinfair-CSP-A016/StarBot-AGLAS/master/LICENSE">
-    <img src="https://img.shields.io/github/license/Rinfair-CSP-A016/StarBot-AGLAS" alt="license">
-  </a>
+
+[![Nonebot2](https://img.shields.io/badge/Onebot-Nonebot2-red?style=for-the-badge&logo=appveyor&color=blue)](https://github.com/nonebot/nonebot2)
+[![cqhttp](https://img.shields.io/badge/OneBot-go--cqhttp-green.svg?style=for-the-badge&logo=appveyor&color=blue)](https://github.com/Mrs4s/go-cqhttp)
+[![Release-version](https://img.shields.io/github/v/release/Rinfair-CSP-A016/StarBot-AGLAS?include_prereleases&label=Version&display_name=tag&style=for-the-badge)](https://github.com/Rinfair-CSP-A016/StarBot-AGLAS/releases)
+[![Release date](https://img.shields.io/github/release-date-pre/Rinfair-CSP-A016/StarBot-AGLAS?style=for-the-badge)](https://github.com/Rinfair-CSP-A016/StarBot-AGLAS/releases)
+[![license](https://img.shields.io/github/license/Rinfair-CSP-A016/StarBot-AGLAS?style=for-the-badge)](https://github.com/Rinfair-CSP-A016/StarBot-AGLAS/blob/master/LICENSE)
+
 
 <div align="left">
 
@@ -147,7 +151,6 @@ b40 / b50 | 根据[查分器](https://www.diving-fish.com/maimaidx/prober/)数�
 
 ## License
 
-
-使用此软件代码须遵守 MIT License 。
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FStarBot-AGLAS.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FStarBot-AGLAS?ref=badge_large)
 
 您可以自由使用本项目的代码用于商业或非商业的用途，但必须附带MIT License。
