@@ -311,6 +311,12 @@ def changeColumnWidth(s: str, len: int) -> str:
          if res <= len:
             sList.append(ch)
      return ''.join(sList)
+def get_offset_for_true_mm(text, draw, font):
+    anchor_bbox = draw.textbbox((0, 0), text, font=font, anchor='lt')
+    anchor_center = (anchor_bbox[0] + anchor_bbox[2]) // 2, (anchor_bbox[1] + anchor_bbox[3]) // 2
+    mask_bbox = font.getmask(text).getbbox()
+    mask_center = (mask_bbox[0] + mask_bbox[2]) // 2, (mask_bbox[1] + mask_bbox[3]) // 2
+    return anchor_center[0] - mask_center[0], anchor_center[1] - mask_center[1]
 
 @query_chart.handle()
 async def _(event: Event, message: Message = EventMessage()):
@@ -578,7 +584,7 @@ async def _(event: Event, message: Message = CommandArg()):
     for i in range(14):
         wm_value.append(h & 3)
         h >>= 2
-    pic_dir = 'src/static/mai/pic/'         
+    pic_dir = 'src/static/mai/pic/'
     baseimage =  Image.open(os.path.join(pic_dir, f'StarTips.png')).convert('RGBA')
     font = ImageFont.truetype('src/static/HOS.ttf', 36, encoding='utf-8')
     fonttips = ImageFont.truetype('src/static/HOS.ttf', 24, encoding='utf-8')
@@ -588,6 +594,7 @@ async def _(event: Event, message: Message = CommandArg()):
     fontBoldL = ImageFont.truetype('src/static/HOS_Med.ttf', 48, encoding='utf-8')
     imageDraw = ImageDraw.Draw(baseimage);
     imageDraw.text((48, 125), f"{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}", 'white', font)
+    offset = get_offset_for_true_mm(f"{ap}", imageDraw, fontLV)
     if luck >= 50:
         imageDraw.text((962, 228), f"吉", 'black', font1)
     else:
@@ -598,7 +605,10 @@ async def _(event: Event, message: Message = CommandArg()):
     else:
         imageDraw.text((130, 555), f"{bwm_list_perfect[dwm_value_1]}", 'white', font)
         imageDraw.text((130, 705), f"{bwm_list_bad[dwm_value_2]}", 'white', font)
-    imageDraw.text((170, 886), f"{ap}", 'white', fontLV)
+    if ap < 10:
+        imageDraw.text((197 + offset[0], 934 + offset[1]), f"{ap}", 'white', fontLV, anchor = 'mm')
+    else:
+        imageDraw.text((194 + offset[0], 934 + offset[1]), f"{ap}", 'white', fontLV, anchor = 'mm')
     for i in range(14):
         if wm_value[i] == 3:
             good_value[good_count] = i

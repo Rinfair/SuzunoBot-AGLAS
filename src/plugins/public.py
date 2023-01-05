@@ -42,7 +42,7 @@ async def _(event: Event, message: Message = CommandArg()):
     pic_dir = 'src/static/mai/pic/'
     codename = 'AGLAS for QQ-Group'
     version = '2.0.1'
-    debugver = 'Beta 0.93'
+    debugver = 'Beta 0.95'
     about_str =  f"版本代号: {codename}\n版本号: {version} ({debugver})\nPowered by Rinfair & Killua.\n\n感谢以下开发者对AGLAS的代码贡献:\n@Killua (Kiba)\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n@SEAFHMC (Arcaea)\n@mnixry (nonebot_guild_patch)\n@Sakurai Kaede"
     image = Image.open(os.path.join(pic_dir, 'StarAbout.png')).convert('RGBA')
     await helper.send(Message([

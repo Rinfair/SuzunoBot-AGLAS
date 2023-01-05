@@ -339,7 +339,7 @@ class DrawBest(object):
             if self._coloumWidth(title) > 12:
                 title = self._changeColumnWidth(title, 11) + '...'
             tempDraw.text((32, 30), title, 'white', font)
-            font = ImageFont.truetype('src/static/msyh.ttc', 26, encoding='utf-8')
+            font = ImageFont.truetype('src/static/Poppins.otf', 26, encoding='utf-8')
             tempDraw.text((30, 62), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
             rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
             rankImg = self._resizePic(rankImg, 0.8)
@@ -360,15 +360,15 @@ class DrawBest(object):
                 syncImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_Blank.png')).convert('RGBA')
                 syncImg = self._resizePic(syncImg, 0.6)
                 temp.paste(syncImg, (202, 80), syncImg.split()[3])
-            font = ImageFont.truetype('src/static/msyh.ttc', 16, encoding='utf-8')
+            font = ImageFont.truetype('src/static/Poppins.otf', 16, encoding='utf-8')
             tempDraw.text((36, 108), f'{chartInfo.ds}', 'black', font)
-            font = ImageFont.truetype('src/static/msyh.ttc', 24, encoding='utf-8')
+            font = ImageFont.truetype('src/static/Poppins.otf', 24, encoding='utf-8')
             tempDraw.text((125, 96), f'{chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'black', font)
             if num >= 9:
-                font = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
+                font = ImageFont.truetype('src/static/Poppins.otf', 13, encoding='utf-8')
                 tempDraw.text((177, 105), f'#{num + 1}/{len(sdBest)}', 'black', font)
             else:
-                font = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
+                font = ImageFont.truetype('src/static/Poppins.otf', 13, encoding='utf-8')
                 tempDraw.text((181, 105), f'#{num + 1}/{len(sdBest)}', 'black', font)
             alphaPath = os.path.join(self.pic_dir, f'alpha.png')
             alpha = Image.open(alphaPath).convert('L')
@@ -423,7 +423,7 @@ class DrawBest(object):
             if self._coloumWidth(title) > 12:
                 title = self._changeColumnWidth(title, 11) + '...'
             tempDraw.text((32, 30), title, 'white', font)
-            font = ImageFont.truetype('src/static/msyh.ttc', 26, encoding='utf-8')
+            font = ImageFont.truetype('src/static/Poppins.otf', 26, encoding='utf-8')
             tempDraw.text((30, 62), f'{"%.4f" % chartInfo.achievement}%', 'white', font)
             rankImg = Image.open(os.path.join(self.pic_dir, f'UI_GAM_Rank_{rankPic[chartInfo.scoreId]}.png')).convert('RGBA')
             rankImg = self._resizePic(rankImg, 0.8)
@@ -444,15 +444,15 @@ class DrawBest(object):
                 syncImg = Image.open(os.path.join(self.pic_dir, f'UI_MSS_MBase_Icon_Blank.png')).convert('RGBA')
                 syncImg = self._resizePic(syncImg, 0.6)
                 temp.paste(syncImg, (202, 80), syncImg.split()[3])
-            font = ImageFont.truetype('src/static/msyh.ttc', 16, encoding='utf-8')
+            font = ImageFont.truetype('src/static/Poppins.otf', 16, encoding='utf-8')
             tempDraw.text((36, 108), f'{chartInfo.ds}', 'black', font)
-            font = ImageFont.truetype('src/static/msyh.ttc', 24, encoding='utf-8')
+            font = ImageFont.truetype('src/static/Poppins.otf', 24, encoding='utf-8')
             tempDraw.text((125, 96), f'{chartInfo.ra if not self.b50 else computeRa(chartInfo.ds, chartInfo.achievement, True)}', 'black', font)
             if num >= 9:
-                font = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
+                font = ImageFont.truetype('src/static/Poppins.otf', 13, encoding='utf-8')
                 tempDraw.text((177, 105), f'#{num + 1}/{len(dxBest)}', 'black', font)
             else:
-                font = ImageFont.truetype('src/static/msyh.ttc', 13, encoding='utf-8')
+                font = ImageFont.truetype('src/static/Poppins.otf', 13, encoding='utf-8')
                 tempDraw.text((181, 105), f'#{num + 1}/{len(dxBest)}', 'black', font)
             alphaPath = os.path.join(self.pic_dir, f'alpha.png')
             alpha = Image.open(alphaPath).convert('L')
@@ -552,7 +552,7 @@ class DrawBest(object):
 
         ratingImg = Image.open(os.path.join(self.pic_dir, 'Rating.png')).convert('RGBA')
         ratingDraw = ImageDraw.Draw(ratingImg)
-        font = ImageFont.truetype('src/static/msyh.ttc', 68, encoding='utf-8')
+        font = ImageFont.truetype('src/static/Poppins.otf', 68, encoding='utf-8')
         try:
             ratingDraw.text((146, 25), f'{self.sdBest[0].ra if not self.b50 else computeRa(self.sdBest[0].ds, self.sdBest[0].achievement, True)}','white', font)
             ratingDraw.text((424, 25), f'{self.sdBest[int(len(self.sdBest)-1)].ra if not self.b50 else computeRa(self.sdBest[int(len(self.sdBest))-1].ds, self.sdBest[int(len(self.sdBest))-1].achievement, True)}', 'white', font)
