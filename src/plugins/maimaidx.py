@@ -816,7 +816,7 @@ async def _(event: Event, message: Message = EventMessage()):
     result_set = music_aliases[name]
     if len(result_set) == 1:
         music = total_list.by_title(result_set[0])
-        await find_song.finish(Message([{"type": "text", "data": {"text": f"▾ [Sender: {nickname}]\n  Search Result | 别名查歌结果\n您说的应该是：\n"}}] + song_txt(music)))
+        await find_song.finish(Message([MessageSegment("text", {"text": f"▾ [Sender: {nickname}]\n  Search Result | 别名查歌结果\n您说的应该是：\n"})] + song_txt(music)))
     else:
         s = '\n'.join(result_set)
         await find_song.finish(f"▾ [Sender: {nickname}]\n  Search Results | 多个别名查歌结果\n您要找的可能是以下歌曲中的其中一首：\n{ s }")
