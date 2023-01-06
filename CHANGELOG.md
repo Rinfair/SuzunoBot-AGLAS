@@ -1,4 +1,4 @@
-# StarBot_AGLAS 更新日志 Changelog
+# SuzunoBot-AGLAS 更新日志 Changelog
 
 ## [v2.0.1 Beta 0.95]-图片生成方案优化&QQ频道兼容
 
@@ -8,6 +8,8 @@
 - 移除本地QQ频道兼容插件，改用[nonebot-plugin-guild-patch](https://github.com/mnixry/nonebot-plugin-guild-patch)，并同步更新`requirements.txt`以及`plugin-list.json`，完成了所有本地插件对QQ频道的兼容
 - 更新部分mai-bot曲绘到静态文件`static.zip`（至最后一次commit为止新增` 2 `张）
 - 修复maimai模块别名查歌响应器不适配nonebot v11的问题
+- 修复[b40/b50生成函数返回值在Pylance中报错的问题](https://stackoverflow.com/questions/70929777/type-annotations-tuple-type-vs-union-type)
+- StarBot更名为SuzunoBot，星酱更名为铃乃，代号保持不变（仍为AGLAS）
 
 ## [v2.0.1 Beta 0.93]-自KibaBot重制&修复
 

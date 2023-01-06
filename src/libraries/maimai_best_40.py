@@ -3,7 +3,7 @@ import asyncio
 import os
 import math
 import numpy as np
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Tuple
 from io import BytesIO
 
 import requests
@@ -629,7 +629,7 @@ async def get_player_data(payload: Dict):
         return player_data, 0
 
 
-async def generate(payload: Dict, platenum: int or str, platetitle: int or str) -> (Optional[Image.Image], bool):
+async def generate(payload: Dict, platenum: int or str, platetitle: int or str) -> Tuple[Optional[Image.Image], bool]:
     obj, success = await get_player_data(payload)
     if success != 0: return None, success
     qqId = None

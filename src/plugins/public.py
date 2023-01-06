@@ -31,7 +31,7 @@ helper = on_command('help')
 
 @helper.handle()
 async def _(event: Event, message: Message = CommandArg()):
-    about_str = f"▾ Getting Started | 上手帮助\n您可以查询以下模块的指令帮助，部分功能是否可用取决于您所在的群管理员的设置。\n关于星酱: about\nMaimai DX 模块: maimai.help\n跑团/COC 模块: .help\nArcaea 模块: arc help\n其它功能: public.help\n群管理模块(未启用): admin.help\n星酱漂流社区(未启用): community.help\nAGLAS系统设置: sys.help"
+    about_str = f"▾ Getting Started | 上手帮助\n您可以查询以下模块的指令帮助，部分功能是否可用取决于您所在的群管理员的设置。\n关于铃乃: about\nMaimai DX 模块: maimai.help\n跑团/COC 模块: .help\nArcaea 模块: arc help\n其它功能: public.help\n群管理模块(未启用): admin.help\n铃乃漂流社区(未启用): community.help\nSuzuno系统设置: sys.help"
     await helper.send(Message([
         MessageSegment("text", {"text": about_str})
     ]))
@@ -41,13 +41,13 @@ about = on_command('about')
 @about.handle()
 async def _(event: Event, message: Message = CommandArg()):
     pic_dir = 'src/static/mai/pic/'
-    codename = 'AGLAS for QQ-Group'
+    codename = 'Suzuno for QQ-Group'
     version = '2.0.1'
     debugver = 'Beta 0.95'
-    about_str =  f"版本代号: {codename}\n版本号: {version} ({debugver})\nPowered by Rinfair & Killua.\n\n感谢以下开发者对AGLAS的代码贡献:\n@Killua (Kiba)\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n@SEAFHMC (Arcaea)\n@mnixry (nonebot_guild_patch)\n@Sakurai Kaede"
+    about_str =  f"版本代号: {codename}\n版本号: {version} ({debugver})\nPowered by Rinfair & Killua.\n\n感谢以下开发者对Suzuno的代码贡献:\n@Killua (Kiba)\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n@SEAFHMC (Arcaea)\n@mnixry (nonebot_guild_patch)\n@Sakurai Kaede"
     image = Image.open(os.path.join(pic_dir, 'StarAbout.png')).convert('RGBA')
     await helper.send(Message([
-        MessageSegment("text", {"text": "▾ About AGLAS | 关于 星酱"}),
+        MessageSegment("text", {"text": "▾ About Suzuno | 关于 铃乃"}),
         MessageSegment("image", {"file": f"base64://{str(image_to_base64(image), encoding='utf-8')}"}),
         MessageSegment("text", {"text": about_str})
     ]))
@@ -76,13 +76,13 @@ gocho <str1> <str2>                                                         生�
 投骰子<数量>                                                                       在线投骰子(?)
 投百面骰子<数量>                                                             * 可以选择六面/百面
 
-                                                                                              这个功能可以随机禁言你1-600秒，前提星酱有权限。
+                                                                                              这个功能可以随机禁言你1-600秒，前提铃乃有权限。
 烟我                                                                                    * 注意:为防止误触发，
-                                                                                              这个功能你需要at一下星酱再说这个命令才能执行。
+                                                                                              这个功能你需要at一下铃乃再说这个命令才能执行。
 
                                                                                                群里摇人。
 随个[男/女]群友                                                                    你也可以不带参数直接说“随个”然后后面加啥都可以。
-                                                                                               当然星酱容易骂你就是了。
+                                                                                               当然铃乃容易骂你就是了。
 
 帮选                                                                                      帮你选 
 
@@ -95,7 +95,7 @@ gocho <str1> <str2>                                                         生�
 
 我的抽卡情况/抽卡情况                                                        查看抽卡模拟器的抽卡情况
 
-ping                                                                                  查看AGLAS运行情况 (Code By Sakurai Kaede)
+ping                                                                                  查看Suzuno运行情况 (Code By Sakurai Kaede)
 ------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -296,7 +296,7 @@ async def _(bot: Bot, event: Event, message: Message = CommandArg()):
         await poke_setting.send(f"▾ 戳一戳设置 - 成功\n戳一戳已成功设置为: {argv[0]}")
         await db.commit()
     except (IndexError, ValueError):
-        await poke_setting.finish("▾ 戳一戳设置 - 帮助\n本命令的格式:\n戳一戳设置 <默认/限制 (秒)/禁用>\n\n - 默认:将启用默认的戳一戳设定，包括随机性抽中禁言 1 - 1 分 30 秒。\n - 限制 (秒):在戳完一次星酱的指定时间内，调用戳一戳只会让星酱反过来戳你。在指定时间外时，与默认相同。\n- 禁用:禁用戳一戳的相关功能。")
+        await poke_setting.finish("▾ 戳一戳设置 - 帮助\n本命令的格式:\n戳一戳设置 <默认/限制 (秒)/禁用>\n\n - 默认:将启用默认的戳一戳设定，包括随机性抽中禁言 1 - 1 分 30 秒。\n - 限制 (秒):在戳完一次铃乃的指定时间内，调用戳一戳只会让铃乃反过来戳你。在指定时间外时，与默认相同。\n- 禁用:禁用戳一戳的相关功能。")
         pass
 
 shuffle = on_command('shuffle')
