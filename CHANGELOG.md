@@ -7,6 +7,7 @@
 - 更换b40/b50中使用的部分字体，提升美观度
 - 移除本地QQ频道兼容插件，改用[nonebot-plugin-guild-patch](https://github.com/mnixry/nonebot-plugin-guild-patch)，并同步更新`requirements.txt`以及`plugin-list.json`，完成了所有本地插件对QQ频道的兼容
 - 更新部分mai-bot曲绘到静态文件`static.zip`（至最后一次commit为止新增` 2 `张）
+- 修复maimai模块别名查歌响应器不适配nonebot v11的问题
 
 ## [v2.0.1 Beta 0.93]-自KibaBot重制&修复
 
