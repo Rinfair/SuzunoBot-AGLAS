@@ -1,5 +1,5 @@
 @echo off
-echo 受指令影响，正在重新启动 AGLAS....
+echo 锟斤拷指锟斤拷影锟届，锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷 Suzuno....
 taskkill /im python.exe /f
 cd..
 cd..

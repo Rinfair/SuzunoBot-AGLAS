@@ -10,8 +10,8 @@ config: nonebot.config.Config = driver.config
 
 @driver.on_startup
 async def init_db():
-    config.db = await aiosqlite.connect("src/static/AGLAS.db")
-    logger.info("AGLAS Kernel -> Starting to Create \"AGLAS Database\"")
+    config.db = await aiosqlite.connect("src/static/Suzuno.db")
+    logger.info("Suzuno Kernel -> Starting to Create \"Suzuno Database\"")
     try:
         await config.db.executescript(
             "create table group_poke_table (group_id bigint primary key not null, last_trigger_time int, triggered int, disabled bit, strategy text);"
@@ -28,9 +28,9 @@ async def init_db():
             "create table plate_table (id bigint, platenum bigint);"
             "create table title_table (username text, qq bigint, title text);"
             )
-        logger.info("AGLAS Kernel -> Create \"AGLAS Database\" successfully")
+        logger.info("Suzuno Kernel -> Create \"Suzuno Database\" successfully")
     except Exception as e:
-        logger.info(f"AGLAS Kernel --Skip-> Database Created....Skipped Creating Databases. \n[SKIP ERR]{e}")
+        logger.info(f"Suzuno Kernel --Skip-> Database Created....Skipped Creating Databases. \n[SKIP ERR]{e}")
         pass
 
 @driver.on_shutdown

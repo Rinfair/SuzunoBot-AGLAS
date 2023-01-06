@@ -38,7 +38,7 @@ driver = get_driver()
 
 @driver.on_startup
 def _():
-    logger.info("AGLAS Kernel -> Load \"DX\" successfully")
+    logger.info("Suzuno Kernel -> Load \"DX\" successfully")
 
 help_mai = on_command('maimai.help')
 
@@ -81,7 +81,7 @@ b40 | b50    ->    根据查分器数据生成您的或指定账户的 Best 40 /
 <等级><Rank/Sync/Combo状态>进度    ->    查询您的查分器，获取对应等级的完成度。
 * Rank: S/S+/SS/SS+/SSS/SSS+等    Sync: FS/FS+/FDX/FDX+ Combo: FC/FC+/AP/AP+
 
-我要在<等级>上<分值>分    ->    星酱的锦囊 - 快速推荐上分歌曲。
+我要在<等级>上<分值>分    ->    铃乃的锦囊 - 快速推荐上分歌曲。
 
 查看排名 | 查看排行    ->    查看查分器网站 Rating 的 TOP50 排行榜！
 
@@ -916,12 +916,12 @@ async def _(event: Event, message: Message = CommandArg()):
         await c.execute(f'select * from gld_table where uid="{event.user_id}"')
         data = await c.fetchone()
         if data is None:
-            await setplate.send(f"▿ [Sender: {nickname}]\n  Plate Changer Error | 错误\n在频道内，您需要绑定 QQ 才允许使用更换名牌版功能。您尚未将您的 QQ 绑定到星酱，请进行绑定或输入用户名再试一次。\n")
+            await setplate.send(f"▿ [Sender: {nickname}]\n  Plate Changer Error | 错误\n在频道内，您需要绑定 QQ 才允许使用更换名牌版功能。您尚未将您的 QQ 绑定到铃乃，请进行绑定或输入用户名再试一次。\n")
             return
         else:
             qq = str(data[0])
     if platenum == "":
-        await setplate.finish(f"▿ [Sender: {nickname}]\n  Plate Changer | 更换名牌板\n除将/极/神/舞舞牌子需要您查询一次清谱后自动为您更换外，您还可以使用‘setplate 对应数字’更换普通名牌板。\n星酱当前收录的普通名牌板如下(持续更新):\n0.默认\n1.maimai でらっくす\n2.全国制霸 でらっくす\n3.はっぴー（ゆにばーす）\n4.东方Projectちほー\n5.炎炎ノ消防队ちほー\n6.でらっくすちほー おしゃま牛乳\n另外内置了一个彩蛋牌子，是 KING of Performai 3rd ファイナリスト，提示是“21、11、9”。")
+        await setplate.finish(f"▿ [Sender: {nickname}]\n  Plate Changer | 更换名牌板\n除将/极/神/舞舞牌子需要您查询一次清谱后自动为您更换外，您还可以使用‘setplate 对应数字’更换普通名牌板。\n铃乃当前收录的普通名牌板如下(持续更新):\n0.默认\n1.maimai でらっくす\n2.全国制霸 でらっくす\n3.はっぴー（ゆにばーす）\n4.东方Projectちほー\n5.炎炎ノ消防队ちほー\n6.でらっくすちほー おしゃま牛乳\n另外内置了一个彩蛋牌子，是 KING of Performai 3rd ファイナリスト，提示是“21、11、9”。")
     elif int(platenum) < 0 and int(platenum) > 6 and int(platenum) != 1001:
         await setplate.finish(f"▿ [Sender: {nickname}]\n  Plate Changer | 更换名牌板\n请输入正确的名牌板号码。")
     else:
@@ -982,7 +982,7 @@ async def _(event: Event, message: Message = CommandArg()):
             else:
                 await c.execute(f"update title_table set title='{title}' where qq='{str(event.get_user_id())}'")
             await db.commit()
-            await settitle.send(f"▾ [Sender: {nickname}]\n  B40/B50 自定义称号\n您已成功设置了您的 B40/B50 称号！在您自助查询/他人在AGLAS上查询您的 B40/B50 时，此称号会展示在称号栏上。")
+            await settitle.send(f"▾ [Sender: {nickname}]\n  B40/B50 自定义称号\n您已成功设置了您的 B40/B50 称号！在您自助查询/他人在Suzuno上查询您的 B40/B50 时，此称号会展示在称号栏上。")
             return
     else:
         await settitle.send(f"▿ [Sender: {nickname}]\n  B40/B50 自定义称号\n经检查，您的QQ号码与此查分器账户所绑定的号码不一致。请检查您的设置后再试。")
@@ -1001,7 +1001,7 @@ async def _(event: Event, message: Message = CommandArg()):
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Error | 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到星酱，请进行绑定或输入用户名再试一次。\n")
+                await best_40_pic.send(f"▿ [Sender: {nickname}]\n  Best 40: Error | 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到铃乃，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 payload = {'qq': str(data[0])}
@@ -1040,7 +1040,7 @@ async def _(event: Event, message: Message = CommandArg()):
         else:
             title = str(data2[2])
         platenum = 0
-    waitingline = ['正在查询此账户的 Best 40', '正在绘制此账户的成分', '先让星酱楞一会神', '联系服务器还需要一段时间捏', '星酱正在看只因的鬼畜视频，你先等一会', '我知道你很急，你先别急', '星酱不小心吃了华莱士......等一下', '正在描绘船新版本的B40', '稍微等一下嗷']
+    waitingline = ['正在查询此账户的 Best 40', '正在绘制此账户的成分', '先让铃乃楞一会神', '联系服务器还需要一段时间捏', '铃乃正在看只因的鬼畜视频，你先等一会', '我知道你很急，你先别急', '铃乃不小心吃了华莱士......等一下', '正在描绘船新版本的B40', '稍微等一下嗷']
     await best_40_pic.send(f'▾ [Sender: {nickname}]\n  Generating B40 | 正在生成\n{waitingline[random.randint(0,8)]}，这需要大概 1-3 分钟。')
     try:
         img, success = await generate(payload, platenum, title)
@@ -1076,7 +1076,7 @@ async def _(event: Event, message: Message = CommandArg()):
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Error | 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到星酱，请进行绑定或输入用户名再试一次。\n")
+                await best_50_pic.send(f"▿ [Sender: {nickname}]\n  Best 50: Error | 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到铃乃，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 payload = {'qq': str(data[0])}
@@ -1116,7 +1116,7 @@ async def _(event: Event, message: Message = CommandArg()):
             title = str(data2[2])
         platenum = 0
     payload['b50'] = True
-    waitingline = ['正在查询此账户的 Best 50', '正在绘制此账户的成分', '先让星酱楞一会神', '联系服务器还需要一段时间捏', '星酱正在看只因的鬼畜视频，你先等一会', '我知道你很急，你先别急', '星酱不小心吃了华莱士......等一下', '正在描绘船新版本的B50', '稍微等一下嗷']
+    waitingline = ['正在查询此账户的 Best 50', '正在绘制此账户的成分', '先让铃乃楞一会神', '联系服务器还需要一段时间捏', '铃乃正在看只因的鬼畜视频，你先等一会', '我知道你很急，你先别急', '铃乃不小心吃了华莱士......等一下', '正在描绘船新版本的B50', '稍微等一下嗷']
     await best_50_pic.send(f'▾ [Sender: {nickname}]\n  Generating B50 | 正在生成\n{waitingline[random.randint(0,8)]}，这需要大概 1-3 分钟。')
     try:
         img, success = await generate(payload, platenum, title)
@@ -1153,7 +1153,7 @@ async def _(bot: Bot, event: Event, message: Message = CommandArg()):
             break
     su = Config.superuser
     if m['role'] != 'owner' and m['role'] != 'admin' and str(m['user_id']) not in su:
-        await disable_guess_music.finish("▿ 猜歌 - 设置 - 无权限\n抱歉，只有AGLAS管理人员才有权调整猜歌设置。")
+        await disable_guess_music.finish("▿ 猜歌 - 设置 - 无权限\n抱歉，只有Suzuno管理人员才有权调整猜歌设置。")
         return
     db = get_driver().config.db
     c = await db.cursor()
@@ -1249,7 +1249,7 @@ async def _(bot: Bot, event: Event, state: T_State):
                 await guess_music.send("▿ 猜歌 - 正在进行中\n当前已有正在进行的猜歌，要不要来参与一下呀？")
                 return
     if len(guess_dict) >= 5:
-        await guess_music.finish("▿ 猜歌 - 同时进行的群过多\星酱有点忙不过来了...现在正在猜的群太多啦，晚点再试试如何？")
+        await guess_music.finish("▿ 猜歌 - 同时进行的群过多\铃乃有点忙不过来了...现在正在猜的群太多啦，晚点再试试如何？")
         return
     if k in guess_cd_dict and time.time() < guess_cd_dict[k]:
         await guess_music.finish(f"▿ 猜歌 - 冷却中\n已经猜过一次啦！下次猜歌会在 {time.strftime('%H:%M', time.localtime(guess_cd_dict[k]))} 可用噢。")
@@ -1444,7 +1444,7 @@ async def _(event: Event, message: Message = EventMessage()):
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await plate.send(f"▿ [Sender: {nickname}]\n  Plate - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定星酱，请进行绑定或输入用户名再试一次。\n")
+                await plate.send(f"▿ [Sender: {nickname}]\n  Plate - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定铃乃，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 qq = str(data[0])
@@ -1685,7 +1685,7 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
                 else:
                     await c.execute(f'update plate_table set platenum={platenum} where id={qq}')
                 await db.commit()
-                msg += '\n您在AGLAS上自主查询 B40 或 B50 时，此铭牌将展现在您的姓名框处。'
+                msg += '\n您在Suzuno上自主查询 B40 或 B50 时，此铭牌将展现在您的姓名框处。'
         await plate.send(msg.strip())
 
 levelprogress = on_regex(r'^([0-9]+\+?)\s?(.+)进度\s?(.+)?')
@@ -1716,7 +1716,7 @@ async def _(event: Event, message: Message = EventMessage()):
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await levelprogress.send(f"▿ [Sender: {nickname}]\n  等级清谱查询 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到星酱，请进行绑定或输入用户名再试一次。\n")
+                await levelprogress.send(f"▿ [Sender: {nickname}]\n  等级清谱查询 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到铃乃，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 payload = {'qq': str(data[0])}
@@ -1829,7 +1829,7 @@ async def _(event: Event, message: Message = EventMessage()):
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await rise_score.send(f"▿ [Sender: {nickname}]\n  星酱的锦囊 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到星酱，请进行绑定或输入用户名再试一次。\n")
+                await rise_score.send(f"▿ [Sender: {nickname}]\n  铃乃的锦囊 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到铃乃，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 payload = {'qq': str(data[0])}
@@ -1839,10 +1839,10 @@ async def _(event: Event, message: Message = EventMessage()):
         payload = {'username': res.groups()[2].strip()}
     player_data, success = await get_player_data(payload)
     if success == 400:
-        await rise_score.send(f"▿ [Sender: {nickname}]\n  星酱的锦囊 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
+        await rise_score.send(f"▿ [Sender: {nickname}]\n  铃乃的锦囊 - 错误\n您输入的玩家 ID 没有找到。\n请检查一下您的用户名是否输入正确或有无注册查分器系统？如您没有输入ID，请检查您的QQ是否与查分器绑定正确。\n若需要确认设置，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/")
         return
     elif success == 403:
-        await rise_score.send(f'▿ [Sender: {nickname}]\n  星酱的锦囊 - 被禁止\n{res.groups()[2].strip()} 不允许使用此方式查询。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
+        await rise_score.send(f'▿ [Sender: {nickname}]\n  铃乃的锦囊 - 被禁止\n{res.groups()[2].strip()} 不允许使用此方式查询。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后，不输入用户名再试一次。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
         return
     else:
         dx_ra_lowest = 999
@@ -1884,12 +1884,12 @@ async def _(event: Event, message: Message = EventMessage()):
                             if music_ra - sd_ra_lowest == int(res.groups()[1]) and [int(music.id), j, music_ra] not in player_sd_list:
                                 music_sd_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, music.stats[j].difficulty])
         if len(music_dx_list) == 0 and len(music_sd_list) == 0:
-            await rise_score.send(f"▿ [Sender: {nickname}]\n  星酱的锦囊 - 无匹配乐曲\n没有找到这样的乐曲。")
+            await rise_score.send(f"▿ [Sender: {nickname}]\n  铃乃的锦囊 - 无匹配乐曲\n没有找到这样的乐曲。")
             return
         elif len(music_dx_list) + len(music_sd_list) > 60:
-            await rise_score.send(f"▿ [Sender: {nickname}]\n  星酱的锦囊 - 结果过多\n结果太多啦...一共我查到{len(res)} 条符合条件的歌!\n缩小一下查询范围吧。")
+            await rise_score.send(f"▿ [Sender: {nickname}]\n  铃乃的锦囊 - 结果过多\n结果太多啦...一共我查到{len(res)} 条符合条件的歌!\n缩小一下查询范围吧。")
             return
-        msg = f'▼ [Sender: {nickname}]\n  星酱的锦囊 - 升 {res.groups()[1]} 分攻略\n'
+        msg = f'▼ [Sender: {nickname}]\n  铃乃的锦囊 - 升 {res.groups()[1]} 分攻略\n'
         if len(music_sd_list) != 0:
             msg += f'----- B25 区域升分推荐 (旧版本乐曲) -----\n'
             for music, diff, ds, achievement, rank, ra, difficulty in sorted(music_sd_list, key=lambda i: int(i[0]['id'])):
@@ -1914,7 +1914,7 @@ async def _(event: Event, message: Message = CommandArg()):
             await c.execute(f'select * from gld_table where uid="{event.user_id}"')
             data = await c.fetchone()
             if data is None:
-                await base.send(f"▿ [Sender: {nickname}]\n  底分分析 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到星酱，请进行绑定或输入用户名再试一次。\n")
+                await base.send(f"▿ [Sender: {nickname}]\n  底分分析 - 错误\n在频道内，免输入用户名的前提是需要将您的 QQ 进行绑定。您尚未将您的 QQ 绑定到铃乃，请进行绑定或输入用户名再试一次。\n")
                 return
             else:
                 payload = {'qq': str(data[0])}
@@ -2305,7 +2305,7 @@ async def _(event: Event, message: Message = CommandArg()):
                 msg += f"、{min_sp_dx}的S+"
             if min_s_dx != "":
                 msg += f"、{min_s_dx}的S"
-            msg += "可获得的 Rating。\n========\nB15 目前按照当前大版本的最高等级 (即 15.0) 来表示，升分推荐请使用星酱的锦囊命令。"
+            msg += "可获得的 Rating。\n========\nB15 目前按照当前大版本的最高等级 (即 15.0) 来表示，升分推荐请使用铃乃的锦囊命令。"
             await base.send(msg)
         except Exception as e:
             await base.send(f"▿ [Sender: {nickname}]\n  底分分析 - 错误\n出现意外错误啦。\n[Exception Occurred]\n{e}")

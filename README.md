@@ -1,28 +1,28 @@
 <div align="center">
 
-![StarBot-AGLAS](https://socialify.git.ci/Rinfair-CSP-A016/StarBot-AGLAS/image?description=1&descriptionEditable=%E5%9F%BA%E4%BA%8E%20Kiba%20%26%20MaiBot%20%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E7%9A%84%20NoneBot%20%E6%A1%86%E6%9E%B6%E7%9A%84%E5%A4%9A%E5%8A%9F%E8%83%BD%E9%9F%B3%E6%B8%B8%20Bot%EF%BC%8C%20%E7%89%88%E6%9C%AC%20v2.0.1%20Beta%200.95&font=KoHo&forks=1&issues=1&language=1&logo=https%3A%2F%2Fs2.loli.net%2F2023%2F01%2F06%2FmOJSs68BjPKqnoh.jpg&name=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Auto)
+![SuzunoBot-AGLAS](https://socialify.git.ci/Rinfair-CSP-A016/SuzunoBot-AGLAS/image?description=1&descriptionEditable=%E5%9F%BA%E4%BA%8E%20Kiba%20%26%20MaiBot%20%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E7%9A%84%20NoneBot%20%E6%A1%86%E6%9E%B6%E7%9A%84%E5%A4%9A%E5%8A%9F%E8%83%BD%E9%9F%B3%E6%B8%B8%20Bot%EF%BC%8C%20%E7%89%88%E6%9C%AC%20v2.0.1%20Beta%200.95&font=KoHo&forks=1&issues=1&language=1&logo=https%3A%2F%2Fs2.loli.net%2F2023%2F01%2F06%2FmOJSs68BjPKqnoh.jpg&name=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Auto)
 
 <p align="center">
 
 [![Nonebot2](https://img.shields.io/badge/Onebot-Nonebot2-red?style=for-the-badge&logo=appveyor&color=blue)](https://github.com/nonebot/nonebot2)
 [![cqhttp](https://img.shields.io/badge/OneBot-go--cqhttp-green.svg?style=for-the-badge&logo=appveyor&color=blue)](https://github.com/Mrs4s/go-cqhttp)
-[![Release-version](https://img.shields.io/github/v/release/Rinfair-CSP-A016/StarBot-AGLAS?include_prereleases&label=Version&display_name=tag&style=for-the-badge)](https://github.com/Rinfair-CSP-A016/StarBot-AGLAS/releases)
-[![Release date](https://img.shields.io/github/release-date-pre/Rinfair-CSP-A016/StarBot-AGLAS?style=for-the-badge)](https://github.com/Rinfair-CSP-A016/StarBot-AGLAS/releases)
-[![license](https://img.shields.io/github/license/Rinfair-CSP-A016/StarBot-AGLAS?style=for-the-badge)](https://github.com/Rinfair-CSP-A016/StarBot-AGLAS/blob/master/LICENSE)
+[![Release-version](https://img.shields.io/github/v/release/Rinfair-CSP-A016/SuzunoBot-AGLAS?include_prereleases&label=Version&display_name=tag&style=for-the-badge)](https://github.com/Rinfair-CSP-A016/SuzunoBot-AGLAS/releases)
+[![Release date](https://img.shields.io/github/release-date-pre/Rinfair-CSP-A016/SuzunoBot-AGLAS?style=for-the-badge)](https://github.com/Rinfair-CSP-A016/SuzunoBot-AGLAS/releases)
+[![license](https://img.shields.io/github/license/Rinfair-CSP-A016/SuzunoBot-AGLAS?style=for-the-badge)](https://github.com/Rinfair-CSP-A016/SuzunoBot-AGLAS/blob/master/LICENSE)
 
 <div align="left">
 
 ## 欢迎使用
 
-欢迎您使用 StarBot 并搭建属于您自己的 StarBot-AGLAS！
+欢迎您使用 SuzunoBot 并搭建属于您自己的 SuzunoBot-AGLAS！
 
-StarBot-AGLAS 项目是基于 Mai-Bot 与 Kiba 项目融合改造创建的适用于为 Maimai DX/Maimai/雀魂/Arcaea 玩家服务的多功能 Bot。本代码的部分原始内容您可以参阅 [mai-bot](https://github.com/Diving-Fish/mai-bot)、[Kiba](https://github.com/KilluaSakata/Kiba)。
+SuzunoBot-AGLAS 项目是基于 Mai-Bot 与 Kiba 项目融合改造创建的适用于为 Maimai DX/Maimai/雀魂/Arcaea 玩家服务的多功能 Bot。本代码的部分原始内容您可以参阅 [mai-bot](https://github.com/Diving-Fish/mai-bot)、[Kiba](https://github.com/KilluaSakata/Kiba)。
 
 在此感谢 Diving-Fish 的 Mai-Bot / Chiyuki 开源项目以及 Killua 的 Kiba 开源项目。
 
-接下来，本手册为您提供对StarBot最基础的配置教程与支持。更多内容请阅读Wiki。
+接下来，本手册为您提供对SuzunoBot最基础的配置教程与支持。更多内容请阅读Wiki。
 
-有关StarBot-AGLAS的更新内容，请参阅[更新日志](https://github.com/Rinfair-CSP-A016/StarBot-AGLAS/blob/master/CHANGELOG.md)。
+有关SuzunoBot-AGLAS的更新内容，请参阅[更新日志](https://github.com/Rinfair-CSP-A016/SuzunoBot-AGLAS/blob/master/CHANGELOG.md)。
 
 ## Step 1. 安装 Python
 
@@ -90,9 +90,9 @@ servers:
 ```
 08-02 11:50:51 [INFO] nonebot | WebSocket Connection from CQHTTP Bot 114514 Accepted!
 ```
-至此，您可以和对应的 QQ 号聊天并使用 StarBot-AGLAS 的所有功能了。
+至此，您可以和对应的 QQ 号聊天并使用 SuzunoBot-AGLAS 的所有功能了。
 
-**注：自v2.0.1 Beta 0.93起，由于StarBot-AGLAS使用nonebot-plugin-arcaeabot，您需要申请ArcaeaUnlimitedAPI的apiurl以及token才能使用arcaea模块的相关功能，具体请参考[nonebot-plugin-arcaeabot](https://github.com/SEAFHMC/nonebot-plugin-arcaeabot)的相关文档**
+**注：自v2.0.1 Beta 0.93起，由于SuzunoBot-AGLAS使用nonebot-plugin-arcaeabot，您需要申请ArcaeaUnlimitedAPI的apiurl以及token才能使用arcaea模块的相关功能，具体请参考[nonebot-plugin-arcaeabot](https://github.com/SEAFHMC/nonebot-plugin-arcaeabot)的相关文档**
 
 ## FAQ
 
@@ -113,7 +113,7 @@ servers:
 
 ## 帮助与说明
 
-StarBot-AGLAS 主要提供了如下功能：
+SuzunoBot-AGLAS 主要提供了如下功能：
 
 命令 | 功能
 --- | ---
@@ -145,6 +145,6 @@ b40 / b50 | 根据[查分器](https://www.diving-fish.com/maimaidx/prober/)数�
 
 ## License
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FStarBot-AGLAS.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FStarBot-AGLAS?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FSuzunoBot-AGLAS.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FSuzunoBot-AGLAS?ref=badge_large)
 
 您可以自由使用本项目的代码用于商业或非商业的用途，但必须附带MIT License。
