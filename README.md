@@ -1,11 +1,6 @@
 <div align="center">
 
-# StarBot-AGLAS v2.0.1
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable-next-line MD036 -->
-基于 Kiba & MaiBot 项目开发的 NoneBot 框架的多功能音游 Bot，
-版本 v2.0.1 Beta 0.95
-<!-- prettier-ignore-end -->
+![StarBot-AGLAS](https://socialify.git.ci/Rinfair-CSP-A016/StarBot-AGLAS/image?description=1&descriptionEditable=%E5%9F%BA%E4%BA%8E%20Kiba%20%26%20MaiBot%20%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E7%9A%84%20NoneBot%20%E6%A1%86%E6%9E%B6%E7%9A%84%E5%A4%9A%E5%8A%9F%E8%83%BD%E9%9F%B3%E6%B8%B8%20Bot%EF%BC%8C%20%E7%89%88%E6%9C%AC%20v2.0.1%20Beta%200.95&font=KoHo&forks=1&issues=1&language=1&logo=https%3A%2F%2Fs2.loli.net%2F2023%2F01%2F06%2FmOJSs68BjPKqnoh.jpg&name=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Auto)
 
 <p align="center">
 
@@ -15,12 +10,11 @@
 [![Release date](https://img.shields.io/github/release-date-pre/Rinfair-CSP-A016/StarBot-AGLAS?style=for-the-badge)](https://github.com/Rinfair-CSP-A016/StarBot-AGLAS/releases)
 [![license](https://img.shields.io/github/license/Rinfair-CSP-A016/StarBot-AGLAS?style=for-the-badge)](https://github.com/Rinfair-CSP-A016/StarBot-AGLAS/blob/master/LICENSE)
 
-
 <div align="left">
 
 ## 欢迎使用
 
-欢迎您使用 StarBot 并搭建属于您自己的 StarBot-AGLAS！ 
+欢迎您使用 StarBot 并搭建属于您自己的 StarBot-AGLAS！
 
 StarBot-AGLAS 项目是基于 Mai-Bot 与 Kiba 项目融合改造创建的适用于为 Maimai DX/Maimai/雀魂/Arcaea 玩家服务的多功能 Bot。本代码的部分原始内容您可以参阅 [mai-bot](https://github.com/Diving-Fish/mai-bot)、[Kiba](https://github.com/KilluaSakata/Kiba)。
 
