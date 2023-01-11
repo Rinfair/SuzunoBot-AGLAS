@@ -26,7 +26,7 @@ async def init_db():
             "create table sign_table (no bigint, id bigint, day int);"
             "create table acard_table (id bigint, times int, six int, five int, four int, three int, two int, one int);"
             "create table plate_table (id bigint, platenum bigint);"
-            "create table title_table (username text, qq bigint, title text);"
+            "create table title_table (id text, qq bigint, title text);"
             )
         logger.info("Suzuno Kernel -> Create \"Suzuno Database\" successfully")
     except Exception as e:
