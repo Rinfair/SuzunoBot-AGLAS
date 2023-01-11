@@ -10,6 +10,7 @@
 - 修复maimai模块别名查歌响应器不适配nonebot v11的问题
 - 修复[b40/b50生成函数返回值在Pylance中报错的问题](https://stackoverflow.com/questions/70929777/type-annotations-tuple-type-vs-union-type)
 - StarBot更名为SuzunoBot，星酱更名为铃乃，代号保持不变（仍为AGLAS）
+- 修复数据库字段与查询语句内容不一致的bug
 
 ## [v2.0.1 Beta 0.93]-自KibaBot重制&修复
 
