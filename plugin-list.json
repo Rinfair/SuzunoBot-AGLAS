@@ -1,4 +1,4 @@
 {
-    "plugins": ["nonebot_plugin_cocdicer","nonebot_plugin_arcaeabot","nonebot_plugin_guild_patch"],
+    "plugins": ["nonebot_plugin_cocdicer","nonebot_plugin_arcaeabot","nonebot_plugin_guild_patch","nonebot_plugin_petpet","nonebot_plugin_memes"],
     "plugin_dirs": ["src/plugins"]
 }

@@ -1,5 +1,9 @@
 # SuzunoBot-AGLAS 更新日志 Changelog
 
+## [v2.0.1 Beta 1.0]-内容更新
+
+- 新增文字、头像表情包插件[nonebot-plugin-petpet](https://github.com/noneplugin/nonebot-plugin-petpet)和[nonebot-plugin-memes](https://github.com/noneplugin/nonebot-plugin-memes)
+
 ## [v2.0.1 Beta 0.95]-图片生成方案优化&QQ频道兼容
 
 - 修复今日运势图片生成过程中推歌率数字不居中的问题，提升生成图片的美观度（居中误差已降低到2px内）
