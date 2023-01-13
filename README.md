@@ -145,6 +145,6 @@ b40 / b50 | 根据[查分器](https://www.diving-fish.com/maimaidx/prober/)数�
 
 ## License
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FSuzunoBot-AGLAS.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FSuzunoBot-AGLAS?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FStarBot-AGLAS.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FRinfair-CSP-A016%2FStarBot-AGLAS?ref=badge_large)
 
 您可以自由使用本项目的代码用于商业或非商业的用途，但必须附带MIT License。
