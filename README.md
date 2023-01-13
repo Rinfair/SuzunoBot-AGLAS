@@ -1,6 +1,6 @@
 <div align="center">
 
-![SuzunoBot-AGLAS](https://socialify.git.ci/Rinfair-CSP-A016/SuzunoBot-AGLAS/image?description=1&descriptionEditable=%E5%9F%BA%E4%BA%8E%20Kiba%20%26%20MaiBot%20%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E7%9A%84%20NoneBot%20%E6%A1%86%E6%9E%B6%E7%9A%84%E5%A4%9A%E5%8A%9F%E8%83%BD%E9%9F%B3%E6%B8%B8%20Bot%EF%BC%8C%20%E7%89%88%E6%9C%AC%20v2.0.1%20Beta%200.95&font=KoHo&forks=1&issues=1&language=1&logo=https%3A%2F%2Fs2.loli.net%2F2023%2F01%2F06%2FmOJSs68BjPKqnoh.jpg&name=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Auto)
+![SuzunoBot-AGLAS](https://socialify.git.ci/Rinfair-CSP-A016/SuzunoBot-AGLAS/image?description=1&descriptionEditable=%E5%9F%BA%E4%BA%8E%20Kiba%20%26%20MaiBot%20%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E7%9A%84%20NoneBot%20%E6%A1%86%E6%9E%B6%E7%9A%84%E5%A4%9A%E5%8A%9F%E8%83%BD%E9%9F%B3%E6%B8%B8%20Bot%EF%BC%8C%20%E7%89%88%E6%9C%AC%20v2.0.1%20Beta%201.0&font=KoHo&forks=1&issues=1&language=1&logo=https%3A%2F%2Fs2.loli.net%2F2023%2F01%2F06%2FmOJSs68BjPKqnoh.jpg&name=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Auto)
 
 <p align="center">
 

@@ -3,6 +3,8 @@
 ## [v2.0.1 Beta 1.0]-内容更新
 
 - 新增文字、头像表情包插件[nonebot-plugin-petpet](https://github.com/noneplugin/nonebot-plugin-petpet)和[nonebot-plugin-memes](https://github.com/noneplugin/nonebot-plugin-memes)
+- 修改表情包插件资源下载地址至源GitHub链接**（若下载失败请手动下载资源文件）**
+- 添加[nonebot-plugin-imageutils](https://github.com/noneplugin/nonebot-plugin-imageutils)需要的字体文件
 
 ## [v2.0.1 Beta 0.95]-图片生成方案优化&QQ频道兼容
 
