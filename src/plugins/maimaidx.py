@@ -11,6 +11,7 @@ from nonebot.adapters.onebot.v11 import Message, MessageSegment, GroupMessageEve
 
 from src.libraries.tool import hash
 from src.libraries.maimaidx_music import *
+from src.libraries.maimai_pic_generate import *
 from src.libraries.image import *
 from src.libraries.maimai_best_40 import *
 
@@ -89,7 +90,9 @@ b40 | b50    ->    根据查分器数据生成您的或指定账户的 Best 40 /
 
 setplate    ->    更改在您自主查询B40/B50时在姓名框显示的牌子。
 
-设置称号 | settitle <查分器昵称> <自定义称号>   ->    设置自定义称号。                                                                   
+设置称号 | settitle <查分器昵称> <自定义称号>   ->    设置自定义称号。
+
+定数表 <等级> | base <等级>   ->    显示该等级的定数表。（目前只支持 13+ 至 15 之间的查询）                                                            
 ------------------------------------------------------------------------------------------------------------------------------
 
 ▼ 管理员设置 | Administrative                                             
@@ -162,13 +165,27 @@ async def _(event: Event, message: Message = CommandArg()):
         result_set = inner_level_q(float(argv[0]), float(argv[1]))
         s = f"▾ [Sender: {nickname}]\n Search Result | 查歌 定数: {float(argv[0])} - {float(argv[1])}"
     if len(result_set) > 50:
-        await inner_level.finish(f"结果过多（{len(result_set)} 条），请缩小搜索范围。")
-        return
-    resultnum = 0
-    for elem in result_set:
-        resultnum += 1
-        s += f"\nNo: {resultnum} | ID {elem[0]} >\n{elem[1]} {elem[3]} {elem[4]}({elem[2]})"
-    await inner_level.finish(s.strip())
+        try:
+            ids = event.get_session_id()
+            if ids.startswith("group"):
+                await inner_level.finish(f"▿ 搜索结果过多\n结果太多啦！铃乃找到了{len(result_set)} 条符合范围的歌曲，请您先缩小搜索范围或在私聊中来显示所有结果。若私聊铃乃没有反应，请先加铃乃为好友再试。")
+                return
+            else:
+                s += "\n警告: 搜索结果过多，有可能显示不全。"
+                resultnum = 0
+                for elem in result_set:
+                    resultnum += 1
+                    s += f"\nNo: {resultnum} | ID {elem[0]} >\n{elem[1]} {elem[3]} {elem[4]}({elem[2]})"
+                await inner_level.finish(s.strip())
+                return
+        except:
+            pass
+    else:
+        resultnum = 0
+        for elem in result_set:
+            resultnum += 1
+            s += f"\nNo: {resultnum} | ID {elem[0]} >\n{elem[1]} {elem[3]} {elem[4]}({elem[2]})"
+        await inner_level.finish(s.strip())
 
 
 pandora_list = ['我觉得您打白潘不如先去打一下白茄子。', '别潘了，别潘了，滴蜡熊快被潘跑了。', '没有精神！！转圈掉的那么多还想打15!!', '在您玩白潘之前，请您先想一下：截止2021/9，国内SSS+ 4人，SSS 18人，SS 69人。这和您有关吗？不，一点关系都没有。', '潘你🐎', '机厅老板笑着管你收砸坏键子的损失费。', '潘小鬼是吧？', '你不许潘了！']
@@ -270,53 +287,34 @@ async def _(event: Event, message: Message = EventMessage()):
     if len(res) == 0:
         await search_music.send("▿ 无匹配乐曲\n没有找到这样的乐曲。")
     elif len(res) < 50:
-        search_result = "▾ 搜索结果"
+        search_result = f"▾ 搜索结果 - {name}"
         resultnum = 0
         for music in sorted(res, key = lambda i: int(i['id'])):
             resultnum += 1
             search_result += f"\nNo: {resultnum} | ♪ {music['id']} >\n{music['title']}"
         await search_music.finish(Message([
             MessageSegment("text",{"text": search_result.strip()})
-]))
+            ]))
     else:
-        await search_music.send(f"▿ 搜索结果过多\n结果太多啦...一共我查到{len(res)} 条符合条件的歌!\n缩小一下查询范围吧。")
+        try:
+            ids = event.get_session_id()
+            if ids.startswith("group"):
+                await search_music.finish(f"▿ 搜索结果过多\n结果太多啦...我一共查到{len(res)}条符合条件的歌!\n请使用私聊来显示所有的搜索结果。如果私聊无反应，请先加铃乃为好友。")
+                return
+            else:
+                search_result = "▾ 搜索结果\n警告: 搜索结果过多，有可能显示不全。"
+                resultnum = 0
+                for music in sorted(res, key = lambda i: int(i['id'])):
+                    resultnum += 1
+                    search_result += f"\nNo: {resultnum} | ♪ {music['id']} >\n{music['title']}"
+                await search_music.finish(Message([
+                    MessageSegment("text",{"text": search_result.strip()})
+                    ]))
+        except:
+            pass
 
 
 query_chart = on_regex(r"^([绿黄红紫白]?)id([0-9]+)")
-
-def getCharWidth(o) -> int:
-        widths = [
-            (126, 1), (159, 0), (687, 1), (710, 0), (711, 1), (727, 0), (733, 1), (879, 0), (1154, 1), (1161, 0),
-            (4347, 1), (4447, 2), (7467, 1), (7521, 0), (8369, 1), (8426, 0), (9000, 1), (9002, 2), (11021, 1),
-            (12350, 2), (12351, 1), (12438, 2), (12442, 0), (19893, 2), (19967, 1), (55203, 2), (63743, 1),
-            (64106, 2), (65039, 1), (65059, 0), (65131, 2), (65279, 1), (65376, 2), (65500, 1), (65510, 2),
-            (120831, 1), (262141, 2), (1114109, 1),
-        ]
-        if o == 0xe or o == 0xf:
-            return 0
-        for num, wid in widths:
-            if o <= num:
-                return wid
-        return 1
-def coloumWidth(s: str):
-    res = 0
-    for ch in s:
-        res += getCharWidth(ord(ch))
-    return res
-def changeColumnWidth(s: str, len: int) -> str:
-     res = 0
-     sList = []
-     for ch in s:
-         res += getCharWidth(ord(ch))
-         if res <= len:
-            sList.append(ch)
-     return ''.join(sList)
-def get_offset_for_true_mm(text, draw, font):
-    anchor_bbox = draw.textbbox((0, 0), text, font=font, anchor='lt')
-    anchor_center = (anchor_bbox[0] + anchor_bbox[2]) // 2, (anchor_bbox[1] + anchor_bbox[3]) // 2
-    mask_bbox = font.getmask(text).getbbox()
-    mask_center = (mask_bbox[0] + mask_bbox[2]) // 2, (mask_bbox[1] + mask_bbox[3]) // 2
-    return anchor_center[0] - mask_center[0], anchor_center[1] - mask_center[1]
 
 @query_chart.handle()
 async def _(event: Event, message: Message = EventMessage()):
@@ -327,214 +325,30 @@ async def _(event: Event, message: Message = EventMessage()):
     if groups[0] != "":
         try:
             level_index = level_labels.index(groups[0])
-            level_name = ['Basic', 'Advanced', 'Expert', 'Master', 'Re:Master']
             name = groups[1]
             music = total_list.by_id(name)
-            chart = music['charts'][level_index]
-            ds = music['ds'][level_index]
-            level = music['level'][level_index]
-            stats = music['stats'][level_index]
-            pic_dir = 'src/static/mai/pic/'         
-            baseimage =  Image.open(os.path.join(pic_dir, f'levelid.png')).convert('RGBA')
-            if level_index == 0:
-                pic= 'BSC'
-            elif level_index == 1:
-                pic = 'ADV'
-            elif level_index == 2:
-                pic = 'EXP'
-            elif level_index == 3:
-                pic = 'MST'
-            else:
-                pic = 'MST_Re'
-            image = Image.open(os.path.join(pic_dir, f'1{pic}.png')).convert('RGBA')
-            image = image.resize((int(image.size[0] * 1), int(image.size[1] * 1)))
-            try:
-                tag = stats['tag']
-            except:
-                tag = "Insufficient"
-            try:
-                file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
-                imagedata = Image.open(BytesIO(file.content)).convert('RGBA')
-                imagedata = imagedata.resize((int(600), int(600)))
-            except:
-                try:
-                    pic_cover = 'src/static/mai/cover/'
-                    try:
-                        imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.jpg")).convert('RGBA')
-                    except:
-                        imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.png")).convert('RGBA')
-                    imagedata = imagedata.resize((int(600), int(600)))
-                except:
-                    imagedata = Image.open(os.path.join(pic_dir, f'noimage.png')).convert('RGBA')
-            if pic == 'MST_Re':
-                imagedata.paste(image, (8,8), mask=image.split()[3])
-            else:
-                imagedata.paste(image, (5,8), mask=image.split()[3])
-            baseimage.paste(imagedata, (0,0), mask=imagedata.split()[3])
-            font = ImageFont.truetype('src/static/HOS.ttf', 19, encoding='utf-8')
-            fontBold = ImageFont.truetype('src/static/HOS_Med.ttf', 13, encoding='utf-8')
-            fontBoldL = ImageFont.truetype('src/static/HOS_Med.ttf', 28, encoding='utf-8')
-            fontLV = ImageFont.truetype('src/static/HOS.ttf', 36, encoding='utf-8')
-            fontBoldLV = ImageFont.truetype('src/static/HOS_Med.ttf', 26, encoding='utf-8')
-            imageDraw = ImageDraw.Draw(baseimage);
-            if len(chart['notes']) == 4:
-                imagestandard = Image.open(os.path.join(pic_dir, f'UI_UPE_Infoicon_StandardMode.png')).convert('RGBA')
-                imagestandard = imagestandard.resize((int(imagestandard.size[0] * 0.8), int(imagestandard.size[1] * 0.8)))
-                baseimage.paste(imagestandard, (480,26), mask=imagestandard.split()[3])
-                imageDraw.text((63, 630), f'{music["id"]}', 'black', fontBold)
-                if coloumWidth(music["title"]) > 30:
-                    title = changeColumnWidth(music["title"], 20) + '...'
-                    imageDraw.text((33, 680), title, 'black', fontBoldL)
-                else:
-                    imageDraw.text((33, 680), f'{music["title"]}', 'black', fontBoldL)
-                if str(level).rfind("+") == -1:
-                    imageDraw.text((513, 635), f'{level}', 'black', fontLV)
-                else:
-                    imageDraw.text((505, 635), f'{level}', 'black', fontLV)
-                imageDraw.text((355, 840), f'{ds}', 'black', fontBoldLV)
-                imageDraw.text((37, 725), f'{music["basic_info"]["artist"]}', 'black', font)
-                imageDraw.text((40, 835), f'{tag}', 'black', font)
-                imageDraw.text((40, 920), f'{chart["charter"]}', 'black', font)
-                tap = chart['notes'][0]
-                hold = chart['notes'][1]
-                slide = chart['notes'][2]
-                breaknote = chart['notes'][3]
-                if int(tap) >= 100:
-                    imageDraw.text((41, 1100), f'{tap}', 'white', fontLV)
-                elif int(tap) < 100 and int(tap) >= 10:
-                    imageDraw.text((49, 1100), f'{tap}', 'white', fontLV)
-                else:
-                    imageDraw.text((57, 1100), f'{tap}', 'white', fontLV)
-                if int(slide) >= 100:
-                    imageDraw.text((273, 1100), f'{slide}', 'white', fontLV)
-                elif int(slide) < 100 and int(slide) >= 10:
-                    imageDraw.text((281, 1100), f'{slide}', 'white', fontLV)
-                else:
-                    imageDraw.text((289, 1100), f'{slide}', 'white', fontLV)
-                imageDraw.text((398, 1100), f'--', 'white', fontLV)
-                if int(hold) >= 100:
-                    imageDraw.text((153, 1100), f'{hold}', 'white', fontLV)
-                elif int(hold) < 100 and int(hold) >= 10:
-                    imageDraw.text((164, 1100), f'{hold}', 'white', fontLV)
-                else:
-                    imageDraw.text((172, 1100), f'{hold}', 'white', fontLV)
-                if int(breaknote) >= 100:
-                    imageDraw.text((502, 1100), f'{breaknote}', 'white', fontLV)
-                elif int(breaknote) < 100 and int(breaknote) >= 10:
-                    imageDraw.text((510, 1100), f'{breaknote}', 'white', fontLV)
-                else:
-                    imageDraw.text((518, 1100), f'{breaknote}', 'white', fontLV)
-                imageDraw.text((355, 927), f'{tap + slide + hold + breaknote}', 'black', fontBoldLV)
-            else:
-                imagedx = Image.open(os.path.join(pic_dir, f'UI_UPE_Infoicon_DeluxeMode.png')).convert('RGBA')
-                imagedx = imagedx.resize((int(imagedx.size[0] * 0.8), int(imagedx.size[1] * 0.8)))
-                baseimage.paste(imagedx, (480,26), mask=imagedx.split()[3])
-                imageDraw.text((63, 630), f'{music["id"]}', 'black', fontBold)
-                if coloumWidth(music["title"]) > 30:
-                    title = changeColumnWidth(music["title"], 20) + '...'
-                    imageDraw.text((33, 680), title, 'black', fontBoldL)
-                else:
-                    imageDraw.text((33, 680), f'{music["title"]}', 'black', fontBoldL)
-                if str(level).rfind("+") == -1:
-                    imageDraw.text((513, 635), f'{level}', 'black', fontLV)
-                else:
-                    imageDraw.text((501, 635), f'{level}', 'black', fontLV)
-                imageDraw.text((355, 840), f'{ds}', 'black', fontBoldLV)
-                imageDraw.text((37, 725), f'{music["basic_info"]["artist"]}', 'black', font)
-                imageDraw.text((40, 835), f'{tag}', 'black', font)
-                imageDraw.text((40, 920), f'{chart["charter"]}', 'black', font)
-                tap = chart['notes'][0]
-                hold = chart['notes'][1]
-                slide = chart['notes'][2]
-                touch = chart['notes'][3]
-                breaknote = chart['notes'][4]
-                if int(tap) >= 100:
-                    imageDraw.text((41, 1100), f'{tap}', 'white', fontLV)
-                elif int(tap) < 100 and int(tap) >= 10:
-                    imageDraw.text((49, 1100), f'{tap}', 'white', fontLV)
-                else:
-                    imageDraw.text((57, 1100), f'{tap}', 'white', fontLV)
-                if int(slide) >= 100:
-                    imageDraw.text((273, 1100), f'{slide}', 'white', fontLV)
-                elif int(slide) < 100 and int(slide) >= 10:
-                    imageDraw.text((281, 1100), f'{slide}', 'white', fontLV)
-                else:
-                    imageDraw.text((289, 1100), f'{slide}', 'white', fontLV)
-                if int(touch) >= 100:
-                    imageDraw.text((387, 1100), f'{touch}', 'white', fontLV)
-                elif int(touch) < 100 and int(touch) >= 10:
-                    imageDraw.text((395, 1100), f'{touch}', 'white', fontLV)
-                else:
-                    imageDraw.text((403, 1100), f'{touch}', 'white', fontLV)
-                if int(hold) >= 100:
-                    imageDraw.text((153, 1100), f'{hold}', 'white', fontLV)
-                elif int(hold) < 100 and int(hold) >= 10:
-                    imageDraw.text((164, 1100), f'{hold}', 'white', fontLV)
-                else:
-                    imageDraw.text((172, 1100), f'{hold}', 'white', fontLV)
-                if int(breaknote) >= 100:
-                    imageDraw.text((502, 1100), f'{breaknote}', 'white', fontLV)
-                elif int(breaknote) < 100 and int(breaknote) >= 10:
-                    imageDraw.text((510, 1100), f'{breaknote}', 'white', fontLV)
-                else:
-                    imageDraw.text((518, 1100), f'{breaknote}', 'white', fontLV)
-                imageDraw.text((355, 927), f'{tap + slide + hold + breaknote + touch}', 'black', fontBoldLV)
+            title = music['title']
+            baseimage = await charts_info(name, level_index)
             await query_chart.send(Message([
-                MessageSegment("text", {"text": f"▾ [Sender: {nickname}]\n  Details - {music['title']}\n"}),
+                MessageSegment("text", {"text": f"▾ [Sender: {nickname}]\n  Chart Info - {title}\n"}),
                 MessageSegment("image", {"file": f"base64://{str(image_to_base64(baseimage), encoding='utf-8')}"})
             ]))
         except Exception as e:
             await query_chart.send(f"▿ 无匹配乐曲\n我没有找到该谱面，或者当前此歌曲刚刚上线，部分数据残缺。如果是后者等等再试试吧！\n[Exception Occurred]\n{e}")
+            raise e
     else:
         name = groups[1]
-        music = total_list.by_id(name)
         try:
-            pic_dir = 'src/static/mai/pic/'         
-            baseimage = Image.open(os.path.join(pic_dir, f'id.png')).convert('RGBA')
-            try:
-                file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
-                imagedata = Image.open(BytesIO(file.content)).convert('RGBA')
-                imagedata = imagedata.resize((int(600), int(600)))
-            except:
-                try:
-                    pic_cover = 'src/static/mai/cover/'
-                    try:
-                        imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.jpg")).convert('RGBA')
-                    except:
-                        imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.png")).convert('RGBA')
-                    imagedata = imagedata.resize((int(600), int(600)))
-                except:
-                    imagedata = Image.open(os.path.join(pic_dir, f'noimage.png')).convert('RGBA')
-            baseimage.paste(imagedata, (0,0), mask=imagedata.split()[3])
-            font = ImageFont.truetype('src/static/HOS.ttf', 19, encoding='utf-8')
-            fontBold = ImageFont.truetype('src/static/HOS_Med.ttf', 13, encoding='utf-8')
-            fontBoldL = ImageFont.truetype('src/static/HOS_Med.ttf', 28, encoding='utf-8')
-            fontLV = ImageFont.truetype('src/static/HOS.ttf', 36, encoding='utf-8')
-            fontBoldLV = ImageFont.truetype('src/static/HOS_Med.ttf', 20, encoding='utf-8')
-            fontTools = ImageFont.truetype('src/static/adobe_simhei.otf', 20, encoding='utf-8')
-            imageDraw = ImageDraw.Draw(baseimage);
-            imageDraw.text((70, 618), f'{music["id"]}', 'black', fontBold)
-            if coloumWidth(music["title"]) > 30:
-                title = changeColumnWidth(music["title"], 20) + '...'
-                imageDraw.text((33, 660), title, 'black', fontBoldL)
-            else:
-                imageDraw.text((33, 660), f'{music["title"]}', 'black', fontBoldL)
-            if int(music["basic_info"]["bpm"]) >= 100:
-                imageDraw.text((511, 637), f'{music["basic_info"]["bpm"]}', 'black', fontLV)
-            else:
-                imageDraw.text((508, 637), f' {music["basic_info"]["bpm"]}', 'black', fontLV)
-            imageDraw.text((37, 705), f'{music["basic_info"]["artist"]}', 'black', font)
-            imageDraw.text((44, 820), f'{music["basic_info"]["genre"]}', 'black', font)
-            imageDraw.text((44, 903), f'{music["basic_info"]["from"]}', 'black', font)
-            imageDraw.text((50, 1065), f'{"  -  ".join(music["level"])}', 'black', fontLV)
-            imageDraw.text((50, 1170), f'{" - ".join(str(music["ds"]).split(","))}', 'black', fontBoldLV)
-            file = f"https://www.diving-fish.com/covers/{music['id']}.jpg"
+            baseimage = await music_info(name)
+            music = total_list.by_id(name)
+            title = music['title']
             await query_chart.send(Message([
-                MessageSegment("text", {"text": f"▾ [Sender: {nickname}]\n  Music Details - {music['title']}\n"}),
+                MessageSegment("text", {"text": f"▾ [Sender: {nickname}]\n  Music Info - {title}\n"}),
                 MessageSegment("image", {"file": f"base64://{str(image_to_base64(baseimage), encoding='utf-8')}"})
             ]))
         except Exception as e:
             await query_chart.send(f"▿ 无匹配乐曲\n啊这...我没有找到这个歌。\n换一个试试吧。\n[Exception Occurred]\n{e}")
+            raise e
 
 xp_list = ['滴蜡熊', '幸隐', '14+', '白潘', '紫潘', 'PANDORA BOXXX', '排队区', '旧框', '干饭', '超常maimai', '收歌', '福瑞', '削除', 'HAPPY', '谱面-100号', 'lbw', '茄子卡狗', '打五把CSGO', '一姬', '打麻将', '光吉猛修', '怒锤', '暴漫', '鼓动', '鼓动(红)', '大司马', '电棍', '海子姐', '东雪莲', 'GIAO', '去沈阳大街', '一眼丁真', '陈睿']
 
@@ -567,114 +381,10 @@ jrwmnew = on_command('今日运势', aliases={'今日舞萌'})
 @jrwmnew.handle()
 async def _(event: Event, message: Message = CommandArg()):   
     qq = int(event.get_user_id())
-    nickname = event.sender.nickname
-    h = hash(qq)
-    rp = h % 100
-    luck = hash(int((h * 4) / 3)) % 100
-    ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
-    wm_value = []
-    good_value = {}
-    bad_value = {}
-    good_count = 0
-    bad_count = 0
-    dwm_value_1 = random.randint(0,11)
-    dwm_value_2 = random.randint(0,11)
-    tips_value = random.randint(0,11)
-    now = datetime.datetime.now()
-    for i in range(14):
-        wm_value.append(h & 3)
-        h >>= 2
-    pic_dir = 'src/static/mai/pic/'
-    baseimage =  Image.open(os.path.join(pic_dir, f'StarTips.png')).convert('RGBA')
-    font = ImageFont.truetype('src/static/HOS.ttf', 36, encoding='utf-8')
-    fonttips = ImageFont.truetype('src/static/HOS.ttf', 24, encoding='utf-8')
-    font1 = ImageFont.truetype('src/static/HOS.ttf', 38, encoding='utf-8')
-    fontLV = ImageFont.truetype('src/static/HOS.ttf', 72, encoding='utf-8')
-    fontBold = ImageFont.truetype('src/static/HOS_Med.ttf', 20, encoding='utf-8')
-    fontBoldL = ImageFont.truetype('src/static/HOS_Med.ttf', 48, encoding='utf-8')
-    imageDraw = ImageDraw.Draw(baseimage);
-    imageDraw.text((48, 125), f"{now.year}/{now.month}/{now.day} {now.hour}:{now.strftime('%M')}:{now.strftime('%S')}", 'white', font)
-    offset = get_offset_for_true_mm(f"{ap}", imageDraw, fontLV)
-    if luck >= 50:
-        imageDraw.text((962, 228), f"吉", 'black', font1)
-    else:
-        imageDraw.text((962, 228), f"凶", 'black', font1)
-    if dwm_value_1 == dwm_value_2:
-        imageDraw.text((130, 555), f"并无适宜。", 'white', font)
-        imageDraw.text((130, 705), f"也并无忌惮。", 'white', font)
-    else:
-        imageDraw.text((130, 555), f"{bwm_list_perfect[dwm_value_1]}", 'white', font)
-        imageDraw.text((130, 705), f"{bwm_list_bad[dwm_value_2]}", 'white', font)
-    if ap < 10:
-        imageDraw.text((197 + offset[0], 934 + offset[1]), f"{ap}", 'white', fontLV, anchor = 'mm')
-    else:
-        imageDraw.text((194 + offset[0], 934 + offset[1]), f"{ap}", 'white', fontLV, anchor = 'mm')
-    for i in range(14):
-        if wm_value[i] == 3:
-            good_value[good_count] = i
-            good_count = good_count + 1
-        elif wm_value[i] == 0:
-            bad_value[bad_count] = i
-            bad_count = bad_count + 1
-    if good_count == 0:
-        imageDraw.text((420, 925), f"出勤诸事不宜。", 'black', font)
-    else:
-        imageDraw.text((420, 925), f"出勤宜做以下 {good_count} 项事:", 'black', font)
-        s = ""
-        for i in range(good_count):
-            s += f'{wm_list[good_value[i]]} '
-        slist = s.split(" ")
-        newslist = ""
-        for i in range(len(slist)):
-            if i % 7 == 0 and i != 0:
-                newslist += "\n"
-            newslist += f'{slist[i]} '
-        imageDraw.text((350, 1000), f"{newslist}", 'black', font)
-    if bad_count == 0:
-        imageDraw.text((420, 1100), f"出勤一切顺利。", 'black', font)
-    else:
-        imageDraw.text((420, 1100), f"出勤不宜做以下 {bad_count} 项事:", 'black', font)
-        s = ""
-        for i in range(bad_count):
-            s += f'{wm_list[bad_value[i]]} '
-        slist = s.split(" ")
-        newslist = ""
-        for i in range(len(slist)):
-            if i % 7 == 0 and i != 0:
-                newslist += "\n"
-            newslist += f'{slist[i]} '
-        imageDraw.text((350, 1175), f"{newslist}", 'black', font)
-    imageDraw.text((110, 1425), f"{tips_list[tips_value]}", 'black', fonttips)
-    music = total_list[hash(qq) % len(total_list)]
-    try:
-        file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
-        imagedata = Image.open(BytesIO(file.content)).convert('RGBA')
-        imagedata = imagedata.resize((int(400), int(400)))
-    except:
-         try:
-             pic_cover = 'src/static/mai/cover/'
-             try:
-                imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.jpg")).convert('RGBA')
-             except:
-                imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.png")).convert('RGBA')
-             imagedata = imagedata.resize((int(400), int(400)))
-         except:
-             imagedata = Image.open(os.path.join(pic_dir, f'noimage.png')).convert('RGBA')
-             imagedata = imagedata.resize((int(400), int(400)))
-    baseimage.paste(imagedata, (90,1801), mask=imagedata.split()[3])
-    imageDraw.text((582, 1773), f"{music['id']}", 'black', fontBold)
-    if coloumWidth(music["title"]) > 30:
-        title = changeColumnWidth(music["title"], 20) + '...'
-        imageDraw.text((539, 1823), title, 'black', fontBoldL)
-    else:
-        imageDraw.text((539, 1823), f"{music['title']}", 'black', fontBoldL)
-    imageDraw.text((539, 1890), f"{music['basic_info']['artist']}", 'black', fonttips)
-    imageDraw.text((539, 2040), f"{music['basic_info']['genre']}", 'black', fonttips)
-    imageDraw.text((539, 2150), f"{music['basic_info']['from']}", 'black', fonttips)
-    imageDraw.text((95, 2290), f'{"  -  ".join(music["level"])}', 'black', font1)
+    pic = await jrwm_pic(qq)
     await jrwmnew.send(Message([
-        MessageSegment("image", {"file": f"base64://{str(image_to_base64(baseimage), encoding='utf-8')}"}),
-        MessageSegment("text", {"text": f"在查找文字版本的运势板吗？输入命令 '/text 今日运势' 即可激活文字版运势。"})
+        MessageSegment("image", {"file": f"base64://{str(image_to_base64(pic), encoding='utf-8')}"}),
+        MessageSegment("text", {"text": f"输入命令 '/text 今日运势' 来获取文字版运势。"})
         ]))
 
 
@@ -826,7 +536,7 @@ query_score = on_command('分数线')
 
 
 @query_score.handle()
-async def _(event: Event, message: Message = EventMessage()):
+async def _(event: Event, message: Message = CommandArg()):
     r = "([绿黄红紫白])(id)?([0-9]+)"
     argv = str(message).strip().split(" ")
     nickname = event.sender.nickname
@@ -1213,13 +923,7 @@ async def give_answer(bot: Bot, event: Event, state: T_State):
     mid = guess.music['id']
     if int(mid) >= 10001:
         mid = int(mid) - 10000
-    try:
-        asyncio.create_task(bot.send(event, Message([MessageSegment.text("▿ 答案\n都没有猜到吗......那现在揭晓答案！\n♪ " + f"{guess.music['id']} > {guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{mid}.png")])))
-    except:
-        try:
-            asyncio.create_task(bot.send(event, Message([MessageSegment.text("▿ 答案\n都没有猜到吗......那现在揭晓答案！\n♪ " + f"{guess.music['id']} > {guess.music['title']}\n"), MessageSegment.image(f"https://www.diving-fish.com/covers/{mid}.jpg")])))
-        except:
-            asyncio.create_task(bot.send(event, Message([MessageSegment.text("▿ 答案\n都没有猜到吗......那现在揭晓答案！\n♪ " + f"{guess.music['id']} > {guess.music['title']}\n" + "使用 id 命令可以查看歌曲详情。")])))
+    asyncio.create_task(bot.send(event, Message([MessageSegment.text("▿ 答案\n都没有猜到吗......那现在揭晓答案！\n♪ " + f"{guess.music['id']} > {guess.music['title']}\n" + f"发送 “id{guess.music['id']}” 指令可以查看此歌曲的信息。")])))
     del guess_dict[state["k"]]
 
 
@@ -1283,17 +987,10 @@ async def _(event: Event, message: Message = EventMessage()):
         mid = guess.music['id']
         if int(mid) >= 10001:
             mid = int(mid) - 10000
-        try:
-            await guess_music_solve.finish(Message([
-                MessageSegment.reply(event.message_id),
-                MessageSegment.text("▾ 答案\n您猜对了！答案就是：\n" + f"♪ {guess.music['id']} > {guess.music['title']}\n"),
-                MessageSegment.image(f"https://www.diving-fish.com/covers/{mid}.png")
-            ]))
-        except:
-            await guess_music_solve.finish(Message([
-                MessageSegment.reply(event.message_id),
-                MessageSegment.text("▾ 答案\n您猜对了！答案就是：\n" + f"♪ {guess.music['id']} > {guess.music['title']}\n" + "使用 id 命令可以查看歌曲详情。"),
-            ]))
+        await guess_music_solve.finish(Message([
+            MessageSegment.reply(event.message_id),
+            MessageSegment.text("▾ 答案\n您猜对了！答案就是：\n" + f"♪ {guess.music['id']} > {guess.music['title']}\n" + f"发送 “id{guess.music['id']}” 指令可以查看此歌曲的信息。"),
+        ]))
 
 rand_ranking = on_command("段位模式")
 
@@ -2310,3 +2007,23 @@ async def _(event: Event, message: Message = CommandArg()):
         except Exception as e:
             await base.send(f"▿ [Sender: {nickname}]\n  底分分析 - 错误\n出现意外错误啦。\n[Exception Occurred]\n{e}")
             return
+
+baselist = on_command("定数表", aliases={"base"})
+@baselist.handle()
+async def _(event: Event, message: Message = CommandArg()):
+    ds = str(message).strip()
+    nickname = event.sender.nickname
+    if ds != "15" and ds != "14+" and ds != "14" and ds != "13+":
+        await baselist.send(f"▿ [Sender: {nickname}]\n  Base List | 定数表\n目前的定数表暂时只支持 13+ 至 15 之间的查询......")
+        return
+    if ds == "15":
+        ds = "14+"
+    fileimage = Image.open(os.path.join('src/static/mai/pic/', f"dx{ds}.png"))
+    imagedata = f"base64://{str(image_to_base64(fileimage), encoding='utf-8')}"
+    date = "2023/1/5"
+    text = f"▾ [Sender: {nickname}]\n  Base List | 定数表\n您查询的定数表如图。若需要更详细的数据，请使用“定数查歌”命令。\n定数表最近更新时间: {date}。"
+    await baselist.send(Message([
+            MessageSegment.reply(event.message_id),
+            MessageSegment.text(text),
+            MessageSegment.image(imagedata)
+        ]))
