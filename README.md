@@ -26,7 +26,7 @@ SuzunoBot-AGLAS 项目是基于 Mai-Bot 与 Kiba 项目融合改造创建的适�
 
 ## Step 1. 安装 Python
 
-请自行前往 https://www.python.org/ 下载 Python 3 版本（> 3.7）并将其添加到环境变量（在安装过程中勾选 Add Python to system PATH）。对大多数用户来说，您应该下载 Windows installer (64-bit)。**此项目开发者使用Python 3.10.9**
+请自行前往 https://www.python.org/ 下载 Python 3 版本（> 3.8）并将其添加到环境变量（在安装过程中勾选 Add Python to system PATH）。对大多数用户来说，您应该下载 Windows installer (64-bit)。**此项目开发者使用Python 3.10.9**
 
 在 Linux 系统上，可能需要其他方法安装 Python 3，请自行查找。
 
