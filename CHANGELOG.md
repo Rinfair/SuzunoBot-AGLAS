@@ -7,7 +7,7 @@
 - 添加[nonebot-plugin-imageutils](https://github.com/noneplugin/nonebot-plugin-imageutils)需要的字体文件
 - 根据上游仓库KibaBot 5.0.5同步更新相关功能及静态文件
 - 修复找不到字体的问题
-- 弃用nonebot_plugin_cocdicer，改用[nonebot_plugin_orangedice](https://github.com/BigOrangeQWQ/nonebot_plugin_orangedice)
+- 弃用nonebot_plugin_cocdicer，改用[nonebot_dicepp](https://github.com/pear-studio/nonebot-dicepp)
 
 ## [v2.0.1 Beta 0.95]-图片生成方案优化&QQ频道兼容
 
