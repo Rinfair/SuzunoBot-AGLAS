@@ -31,7 +31,7 @@ helper = on_command('help')
 
 @helper.handle()
 async def _(event: Event, message: Message = CommandArg()):
-    about_str = f"▾ Getting Started | 上手帮助\n您可以查询以下模块的指令帮助，部分功能是否可用取决于您所在的群管理员的设置。\n关于铃乃: about\nMaimai DX 模块: maimai.help\n跑团/COC 模块: coc.help\nArcaea 模块: arc help\n其它功能: public.help\n群管理模块(未启用): admin.help\n铃乃漂流社区(未启用): community.help\nSuzuno系统设置: sys.help"
+    about_str = f"▾ Getting Started | 上手帮助\n您可以查询以下模块的指令帮助，部分功能是否可用取决于您所在的群管理员的设置。\n关于铃乃: about\nMaimai DX 模块: maimai.help\n跑团/COC 模块: .help\nArcaea 模块: arc help\n其它功能: public.help\n群管理模块(未启用): admin.help\n铃乃漂流社区(未启用): community.help\nSuzuno系统设置: sys.help"
     await helper.send(Message([
         MessageSegment("text", {"text": about_str})
     ]))
@@ -119,31 +119,6 @@ ping                                                                            
     await help_others.send(Message([
         MessageSegment("image", {"file": f"base64://{str(image_to_base64(text_to_image(help_str)), encoding='utf-8')}"})
     ]))
-
-help_coc = on_command('coc.help')
-
-@help_coc.handle()
-async def _(event: Event, message: Message = CommandArg()):
-    help_str_coc = '''▼ coc模块帮助 | Commands For Coc                                             
-------------------------------------------------------------------------------------------------------------------------------
-.r[公式]                                                                                  骰点（OneDice标准）
-
-.ra[属性]                                                                                 属性骰点（D100检定，请确保属性已录入）
-
-.st[属性][数值]/clear                                                                      人物卡录入/清除
-------------------------------------------------------------------------------------------------------------------------------
-
-
-▼ 模块管理 | Administrative
-------------------------------------------------------------------------------------------------------------------------------
-
-.log on/off/upload/clear                                                                开启/关闭/上传/清除日志
-
-------------------------------------------------------------------------------------------------------------------------------'''
-    await help_coc.send(Message([
-        MessageSegment("image", {"file": f"base64://{str(image_to_base64(text_to_image(help_str_coc)), encoding='utf-8')}"})
-    ]))
-
 
 async def _group_poke(bot: Bot, event: Event) -> bool:
     value = (event.notice_type == "notify" and event.sub_type == "poke" and event.target_id == int(bot.self_id))
