@@ -501,15 +501,14 @@ async def _(event: Event, message: Message = CommandArg()):
     ]))
 
 
-music_aliases = defaultdict(list)
-f = open('src/static/aliases.csv', 'r', encoding='utf-8')
-tmp = f.readlines()
-f.close()
-for t in tmp:
-    arr = t.strip().split('\t')
-    for i in range(len(arr)):
-        if arr[i] != "":
-            music_aliases[arr[i].lower()].append(arr[0])
+def find_music_id(title: str) -> List[int]:
+    url = "https://download.fanyu.site/maimai/alias.json"
+    response = requests.get(url)
+    maimai_data = response.json()
+    music_id = maimai_data.get(title.lower(), None)
+    if music_id is not None:
+        id_set: Set[int] = set(music_id)
+        return list(id_set)
 
 
 find_song = on_regex(r".+是什么歌")
@@ -520,16 +519,28 @@ async def _(event: Event, message: Message = EventMessage()):
     regex = "(.+)是什么歌"
     name = re.match(regex, str(message)).groups()[0].strip().lower()
     nickname = event.sender.nickname
-    if name not in music_aliases:
+    url = "https://download.fanyu.site/maimai/alias.json"
+    response = requests.get(url)
+    if response.status_code != 200:
+        await find_song.finish(f"▿ [Sender: {nickname}]\n  Search | 查歌 - 错误\n别名数据库错误，请检查Suzuno设置。错误代码：{response.status_code}\n")
+        return
+    music_ids = find_music_id(name)
+    if len(music_ids) == 0:
         await find_song.finish(f"▿ [Sender: {nickname}]\n  Search | 查歌 - 错误\n这个别称太新了，我找不到这首歌啦。\n")
         return
-    result_set = music_aliases[name]
-    if len(result_set) == 1:
-        music = total_list.by_title(result_set[0])
+    elif len(music_ids) == 1:
+        music = total_list.by_id(music_ids[0])
         await find_song.finish(Message([MessageSegment("text", {"text": f"▾ [Sender: {nickname}]\n  Search Result | 别名查歌结果\n您说的应该是：\n"})] + song_txt(music)))
     else:
-        s = '\n'.join(result_set)
-        await find_song.finish(f"▾ [Sender: {nickname}]\n  Search Results | 多个别名查歌结果\n您要找的可能是以下歌曲中的其中一首：\n{ s }")
+        s = f"▾ [Sender: {nickname}]\n  Search Results | 多个别名查歌结果\n您要找的可能是以下歌曲中的其中一首："
+        resultnum = 0
+        for music_id in music_ids:
+            resultnum += 1
+            list_temp = total_list.by_id(music_id)
+            s += f"\nNo: {resultnum} | ♪ {list_temp['id']} >\n{list_temp['title']}"
+        await find_song.finish(Message([
+            MessageSegment("text", {"text": s.strip()})
+        ]))
 
 
 query_score = on_command('分数线')
