@@ -5,11 +5,12 @@ from PIL import Image
 from nonebot import on_command, on_message, on_notice, require, get_driver, on_regex
 from nonebot.typing import T_State
 from nonebot.params import CommandArg, EventMessage
-from nonebot.adapters.onebot.v11 import Message, Event, Bot
+from nonebot.adapters.onebot.v11 import Message, Event, Bot, MessageEvent
+from nonebot.log import logger
 from src.libraries.image import *
 from random import randint
 import asyncio
-import openai
+from revChatGPT.V1 import Chatbot
 from nonebot.adapters.onebot.v11 import Message, MessageSegment, GroupMessageEvent, PrivateMessageEvent
 from nonebot_plugin_guild_patch import GuildMessageEvent
 
@@ -20,6 +21,7 @@ from src.libraries.tool import hash
 import os
 import time
 import datetime
+import requests
 from collections import defaultdict
 from src.libraries.config import Config
 
@@ -727,36 +729,69 @@ async def _(event: Event, message: Message = CommandArg()):
     s += f'★6: {data1[2]} 张  ★5: {data1[3]} 张\n★4: {data1[4]} 张  ★3: {data1[5]} 张\n★2: {data1[6]} 张  ★1: {data1[7]} 张'
     await acardcenter.send(s)
 
-def generate_text(prompt, model, temperature, max_tokens):
-    completions = openai.Completion.create(
-        engine=model,
-        prompt=prompt,
-        max_tokens=max_tokens,
-        n=1,
-        stop=None,
-        temperature=temperature,
-    )
-    message = completions.choices[0].text.strip()
-    message = re.sub(r"\n\s*\n", "\n\n", message)
-    return message
+if Config.openai_authentication == 1:
+    config = {
+        "email": Config.openai_email,
+        "password": Config.openai_password,
+        "proxy": Config.openai_proxy
+    }
+elif Config.openai_authentication == 2:
+    config = {
+        "session_token": Config.openai_session_token,
+        "proxy": Config.openai_proxy
+    }
+else:
+    config = None
+user_session = dict()
+chatbot = Chatbot(config, conversation_id=None)
+
+def generate_text(session_id, prompt):
+    if session_id in user_session:
+        # 如果在三分钟内再次发起对话则使用相同的会话ID
+        if time.time() < user_session[session_id]['timestamp'] + 60 * 3:
+            chatbot.conversation_id = user_session[session_id]['conversation_id']
+            chatbot.parent_id = user_session[session_id]['parent_id']
+        else:
+            chatbot.reset_chat()
+    else:
+        chatbot.reset_chat()
+
+    try:
+        for data in chatbot.ask(
+            prompt
+        ):
+            resp = data["message"]
+            user_cache = dict()
+            user_cache['timestamp'] = time.time()
+            user_cache['conversation_id'] = data['conversation_id']
+            user_cache['parent_id'] = data['parent_id']
+            user_session[session_id] = user_cache
+        resp = resp.strip("？")
+        resp = resp.strip("\n")
+        return resp
+    except Exception as e:
+        print(e)
+        return f"发生错误: {str(e)}"
 
 
 chatgpt = on_command("/chat ")
 @chatgpt.handle()
-async def _(event: Event, message: Message = CommandArg()):
+async def _(event: MessageEvent, arg: Message = CommandArg()):
+    if config == None:
+        await chatgpt.finish(f"▿ Suzuno异常，请检查配置文件。")
+        return
     nickname = event.sender.nickname
-    prompt = str(message).strip().split(" ")
+    session_id = event.get_session_id()
+    prompt = arg.extract_plain_text().strip()
+    logger.debug(f"{session_id} {prompt}")
     await chatgpt.send(Message([
         MessageSegment.text(f"▿ [Sender: {nickname}]\n  Suzuno正在生成回复，请稍后。\n"),
-        MessageSegment.text(f"AGLAS安全警告：Suzuno的回复完全由GPT-3模型生成，代码来源于AGLAS Lambda分支，因此其回答可能存在不适当的内容。\n"),
+        MessageSegment.text(f"AGLAS安全警告：Suzuno的回复完全由GPT-3.5模型生成，代码来源于AGLAS Lambda分支，因此其回答可能存在不适当的内容。\n"),
         MessageSegment.text(f"因此，请不要使用该功能生成可能违反当地法律法规的答案。")
     ]))
-    openai.api_key = Config.openai_api_key
-    temperature = Config.openai_temperature
-    model = Config.openai_engine
-    max_tokens = Config.openai_tokens
-    answer = generate_text(prompt, model, temperature, max_tokens)
-    await chatgpt.finish(Message([
+    answer = await asyncio.get_event_loop().run_in_executor(None, generate_text, session_id, prompt)
+    await chatgpt.send(Message([
         MessageSegment.reply(event.message_id),
-        MessageSegment.text(f"▾ [Sender: {nickname}]\n  ChatGPT的回复：\n  {answer}")
+        MessageSegment.text(f"▾ [Sender: {nickname}]\nSuzuno的回复：\n"),
+        MessageSegment.text(answer)
     ]))
