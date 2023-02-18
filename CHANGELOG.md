@@ -10,6 +10,7 @@
 - 弃用nonebot_plugin_cocdicer，改用[nonebot_dicepp](https://github.com/pear-studio/nonebot-dicepp)
 - 更新maimaiDX定数表至CH1.20-F
 - 弃用本地`aliases.csv`文件，改用XrayBot的别名数据库并时刻保持更新
+- 集成了ChatGPT
 
 ## [v2.0.1 Beta 0.95]-图片生成方案优化&QQ频道兼容
 
