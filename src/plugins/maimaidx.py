@@ -2,6 +2,7 @@ from collections import defaultdict
 from msilib.schema import AdvtExecuteSequence
 from tkinter import Image
 from types import MethodType
+from typing import List, Set
 
 from nonebot import on_command, on_message, on_notice, require, get_driver, on_regex
 from nonebot.params import CommandArg, EventMessage
@@ -525,7 +526,7 @@ async def _(event: Event, message: Message = EventMessage()):
         await find_song.finish(f"▿ [Sender: {nickname}]\n  Search | 查歌 - 错误\n别名数据库错误，请检查Suzuno设置。错误代码：{response.status_code}\n")
         return
     music_ids = find_music_id(name)
-    if len(music_ids) == 0:
+    if music_ids is None:
         await find_song.finish(f"▿ [Sender: {nickname}]\n  Search | 查歌 - 错误\n这个别称太新了，我找不到这首歌啦。\n")
         return
     elif len(music_ids) == 1:

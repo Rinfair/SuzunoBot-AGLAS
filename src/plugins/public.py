@@ -1,7 +1,6 @@
 from ast import ExceptHandler
 import random
 import re
-
 from PIL import Image
 from nonebot import on_command, on_message, on_notice, require, get_driver, on_regex
 from nonebot.typing import T_State
@@ -10,6 +9,7 @@ from nonebot.adapters.onebot.v11 import Message, Event, Bot
 from src.libraries.image import *
 from random import randint
 import asyncio
+import openai
 from nonebot.adapters.onebot.v11 import Message, MessageSegment, GroupMessageEvent, PrivateMessageEvent
 from nonebot_plugin_guild_patch import GuildMessageEvent
 
@@ -43,7 +43,7 @@ async def _(event: Event, message: Message = CommandArg()):
     pic_dir = 'src/static/mai/pic/'
     codename = 'Suzuno for QQ-Group'
     version = '2.0.1'
-    debugver = 'Beta 1.0'
+    debugver = 'Beta 1.0 with Lambda-GPT3'
     about_str =  f"版本代号: {codename}\n版本号: {version} ({debugver})\nPowered by Rinfair & Killua.\n\n感谢以下开发者对Suzuno的代码贡献:\n@Killua (Kiba)\n@Diving-Fish (Mai-Bot)\n@BlueDeer233 (maimaiDX)\n@Yuri-YuzuChaN (maimaiDX)\n@SEAFHMC (Arcaea)\n@mnixry (nonebot_guild_patch)\n@Sakurai Kaede"
     image = Image.open(os.path.join(pic_dir, 'StarAbout.png')).convert('RGBA')
     await helper.send(Message([
@@ -100,6 +100,8 @@ ping                                                                            
 头像表情包                                                        查看当前可生成的头像表情包（生成指令请带/）
 
 文字表情包                                                        查看当前可生成的文字表情包（生成指令请带/）
+
+/chat <问题>                                                   问Suzuno问题（使用GPT-3模型生成答案）
 ------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -725,5 +727,36 @@ async def _(event: Event, message: Message = CommandArg()):
     s += f'★6: {data1[2]} 张  ★5: {data1[3]} 张\n★4: {data1[4]} 张  ★3: {data1[5]} 张\n★2: {data1[6]} 张  ★1: {data1[7]} 张'
     await acardcenter.send(s)
 
+def generate_text(prompt, model, temperature, max_tokens):
+    completions = openai.Completion.create(
+        engine=model,
+        prompt=prompt,
+        max_tokens=max_tokens,
+        n=1,
+        stop=None,
+        temperature=temperature,
+    )
+    message = completions.choices[0].text.strip()
+    message = re.sub(r"\n\s*\n", "\n\n", message)
+    return message
 
 
+chatgpt = on_command("/chat ")
+@chatgpt.handle()
+async def _(event: Event, message: Message = CommandArg()):
+    nickname = event.sender.nickname
+    prompt = str(message).strip().split(" ")
+    await chatgpt.send(Message([
+        MessageSegment.text(f"▿ [Sender: {nickname}]\n  Suzuno正在生成回复，请稍后。\n"),
+        MessageSegment.text(f"AGLAS安全警告：Suzuno的回复完全由GPT-3模型生成，代码来源于AGLAS Lambda分支，因此其回答可能存在不适当的内容。\n"),
+        MessageSegment.text(f"因此，请不要使用该功能生成可能违反当地法律法规的答案。")
+    ]))
+    openai.api_key = Config.openai_api_key
+    temperature = Config.openai_temperature
+    model = Config.openai_engine
+    max_tokens = Config.openai_tokens
+    answer = generate_text(prompt, model, temperature, max_tokens)
+    await chatgpt.finish(Message([
+        MessageSegment.reply(event.message_id),
+        MessageSegment.text(f"▾ [Sender: {nickname}]\n  ChatGPT的回复：\n  {answer}")
+    ]))
