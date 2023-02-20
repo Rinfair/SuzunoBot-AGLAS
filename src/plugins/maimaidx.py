@@ -24,6 +24,7 @@ import time
 import math
 from io import BytesIO
 import os
+import pickle
 from src.libraries.maimaidx_guess import GuessObject
 from nonebot.permission import Permission
 from nonebot.log import logger
@@ -351,6 +352,30 @@ async def _(event: Event, message: Message = EventMessage()):
             await query_chart.send(f"▿ 无匹配乐曲\n啊这...我没有找到这个歌。\n换一个试试吧。\n[Exception Occurred]\n{e}")
             raise e
 
+def load_random_numbers():
+    try:
+        with open('random_numbers.pickle', 'rb') as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        return {}
+
+def save_random_numbers(random_numbers):
+    with open('random_numbers.pickle', 'wb') as f:
+        pickle.dump(random_numbers, f)
+
+random_numbers = load_random_numbers()
+
+def get_today():
+    return datetime.date.today().strftime('%Y-%m-%d')
+
+def check_date():
+    today = get_today()
+    if 'date' not in random_numbers or random_numbers['date'] != today:
+        random_numbers.clear()
+        random_numbers['date'] = today
+        save_random_numbers(random_numbers)
+
+
 xp_list = ['滴蜡熊', '幸隐', '14+', '白潘', '紫潘', 'PANDORA BOXXX', '排队区', '旧框', '干饭', '超常maimai', '收歌', '福瑞', '削除', 'HAPPY', '谱面-100号', 'lbw', '茄子卡狗', '打五把CSGO', '一姬', '打麻将', '光吉猛修', '怒锤', '暴漫', '鼓动', '鼓动(红)', '大司马', '电棍', '海子姐', '东雪莲', 'GIAO', '去沈阳大街', '一眼丁真', '陈睿']
 
 jrxp = on_command('jrxp', aliases={'今日性癖'})
@@ -358,10 +383,21 @@ jrxp = on_command('jrxp', aliases={'今日性癖'})
 
 @jrxp.handle()
 async def _(event: Event, message: Message = CommandArg()):
+    check_date()
+    today = get_today()
     qq = int(event.get_user_id())
+    combined = (qq, today)
+    h = hash(str(qq) + today)
+    random.seed(h)
+    r = random.random()
+    rp = hash(str(r) + str(combined)) % 100
+
+    if combined in random_numbers:
+        rp = random_numbers[combined]
+
     nickname = event.sender.nickname
-    h = hash(qq)
-    rp = h % 100
+    random_numbers[combined] = rp
+    save_random_numbers(random_numbers)
     xp = random.randint(0,32)
     s = f"▾ [Sender: {nickname}]\n  今日性癖\n{nickname}今天的性癖是{xp_list[xp]}，人品值是{rp}%.\n不满意的话再随一个吧！"
     await jrxp.finish(Message([
@@ -391,10 +427,21 @@ async def _(event: Event, message: Message = CommandArg()):
 
 @jrwm.handle()
 async def _(event: Event, message: Message = CommandArg()):   
+    check_date()
+    today = get_today()
     qq = int(event.get_user_id())
+    combined = (qq, today)
+    h = hash(str(qq) + today)
+    random.seed(h)
+    r = random.random()
+    rp = hash(str(r) + str(combined)) % 100
+
+    if combined in random_numbers:
+        rp = random_numbers[combined]
+
     nickname = event.sender.nickname
-    h = hash(qq)
-    rp = h % 100
+    random_numbers[combined] = rp
+    save_random_numbers(random_numbers)
     luck = hash(int((h * 4) / 3)) % 100
     ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
     wm_value = []
@@ -475,10 +522,21 @@ jrrp = on_command('jrrp', aliases={'人品值'})
 
 @jrrp.handle()
 async def _(event: Event, message: Message = CommandArg()):
+    check_date()
+    today = get_today()
     qq = int(event.get_user_id())
+    combined = (qq, today)
+    h = hash(str(qq) + today)
+    random.seed(h)
+    r = random.random()
+    rp = hash(str(r) + str(combined)) % 100
+    
+    if combined in random_numbers:
+        rp = random_numbers[combined]
+        
     nickname = event.sender.nickname
-    h = hash(qq)
-    rp = h % 100
+    random_numbers[combined] = rp
+    save_random_numbers(random_numbers)
     luck = hash(int((h * 4) / 3)) % 100
     ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
     s = f"▾ [Sender: {nickname}]\n Character | 人品签\n----------------------\n"
