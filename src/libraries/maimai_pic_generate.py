@@ -12,12 +12,36 @@ import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from src.libraries.maimaidx_music import get_cover_len4_id, total_list
 from src import static
-import datetime, random
+import datetime, random, pickle
 
 wm_list = ['拼机', '推分', '越级', '下埋', '夜勤', '练底力', '练手法', '打旧框', '干饭', '抓DX分', '收歌', '理论值', '打东方曲', '打索尼克曲', '单推']
 bwm_list_perfect = ['拆机:然后您被机修当场处决', '女装:怎么这么好康！（然后受到了欢迎）', '耍帅:看我耍帅还AP+', '击剑:Alea jacta est!(SSS+)', '打滴蜡熊:看我今天不仅推了分，还收了歌！', '日麻:看我三倍役满!!!你们三家全都起飞!!!', '出勤:不出则已，一出惊人，当场AP，羡煞众人。', '看手元:哦原来是这样！看了手元果真推分了。', '霸机:这么久群友都没来，霸机一整天不是梦！', '打Maipad: Maipad上收歌了，上机也收了。', '唱打: Let the bass kick! ', '抓绝赞: 把把2600，轻松理论值！']
 bwm_list_bad = ['拆机:不仅您被机修当场处决，还被人尽皆知。', '女装:杰哥说你怎么这么好康！让我康康！！！（被堵在卫生间角落）', '耍帅:星星全都粉掉了......', '击剑:Alea jacta est!(指在线下真实击剑)', '打滴蜡熊:滴蜡熊打你。', '日麻:我居然立直放铳....等等..三倍役满??????', '出勤:当场分数暴毙，惊呆众人。', '看手元:手法很神奇，根本学不来。', '霸机:......群友曰:"霸机是吧？踢了！"', '打Maipad: 上机还是不大会......', '唱打: 被路人拍下上传到了某音。', '抓绝赞: 捏麻麻我超！！！ --- 这是绝赞(好)的音效。']
 tips_list = ['在游戏过程中,请您不要大力拍打或滑动机器!', '建议您常多备一副手套。', '游玩时注意手指安全。', '游玩过程中注意财物安全。自己的财物远比一个SSS+要更有价值。', '底力不够？建议下埋！不要强行越级，手癖难解。', '文明游玩，游戏要排队，不要做不遵守游戏规则的玩家！', '人品值和宜忌每天0点都会刷新，不喜欢总体运势可以再随一次。', '疫情防护，人人有责。游玩结束后请主动佩戴口罩！', '出勤时注意交通安全。', '迪拉熊不断吃绝赞也不要大力敲打他哟。', '热知识：DX理论值是101.0000，但是旧框没有固定的理论值。', '冷知识：每个绝赞 Perfect 等级有 2600/2550/2500，俗称理论/50落/100落。']
+
+def load_random_numbers():
+    try:
+        with open('src/static/rp.pickle', 'rb') as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        return {}
+
+def save_random_numbers(random_numbers):
+    with open('src/static/rp.pickle', 'wb') as f:
+        pickle.dump(random_numbers, f)
+
+random_numbers = load_random_numbers()
+
+def get_today():
+    return datetime.date.today().strftime('%Y-%m-%d')
+
+def check_date():
+    today = get_today()
+    if 'date' not in random_numbers or random_numbers['date'] != today:
+        random_numbers.clear()
+        random_numbers['date'] = today
+        save_random_numbers(random_numbers)
+
 def getCharWidth(o) -> int:
     widths = [
         (126, 1), (159, 0), (687, 1), (710, 0), (711, 1), (727, 0), (733, 1), (879, 0), (1154, 1), (1161, 0),
@@ -56,8 +80,19 @@ def get_offset_for_true_mm(text, draw, font):
     return anchor_center[0] - mask_center[0], anchor_center[1] - mask_center[1]
 
 async def jrwm_pic(qq: int) -> Optional[Image.Image]:
-    h = hash(qq)
-    rp = h % 100
+    check_date()
+    today = get_today()
+    combined = (qq, today)
+    h = hash(str(qq) + today)
+    random.seed(h)
+    r = random.random()
+    rp = hash(str(r) + str(combined)) % 100
+    
+    if combined in random_numbers:
+        rp = random_numbers[combined]
+        
+    random_numbers[combined] = rp
+    save_random_numbers(random_numbers)
     luck = hash(int((h * 4) / 3)) % 100
     ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
     wm_value = []
