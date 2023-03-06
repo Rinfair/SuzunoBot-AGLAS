@@ -618,7 +618,7 @@ find_alias = on_command('查看别名 ')
 @find_alias.handle()
 async def _(event: Event, message: Message = CommandArg()):
     nickname = event.sender.nickname
-    argv = str(message).strip().split(" ")
+    argv = str(message).strip()
     url = "https://download.fanyu.site/maimai/alias.json"
     response = requests.get(url)
     if response.status_code != 200:
