@@ -12,6 +12,7 @@
 - 弃用本地`aliases.csv`文件，改用XrayBot的别名数据库并时刻保持更新
 - 集成了ChatGPT，使用逆向工程直接调用`chat.openai.com`的API，无需获取API-key
 - 修复推分率、人品、运气值每天不变的bug，优化随机算法
+- 添加使用歌曲ID查看别名列表的功能（数据库来源xraybot）
 
 ## [v2.0.1 Beta 0.95]-图片生成方案优化&QQ频道兼容
 

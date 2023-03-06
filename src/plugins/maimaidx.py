@@ -64,6 +64,8 @@ XXXmaimaiXXX什么    ->    随机一首歌
 
 <歌曲别名>是什么歌    ->    查询乐曲别名对应的乐曲
 
+查看别名 <ID>    ->    查询乐曲的别名
+
 定数查歌 <定数下限> <定数上限>    ->    查询定数对应的乐曲
 
 分数线 <难度+歌曲id> <分数线>    ->    详情请输入“分数线 帮助”查看
@@ -443,7 +445,7 @@ async def _(event: Event, message: Message = CommandArg()):
     random_numbers[combined] = rp
     save_random_numbers(random_numbers)
     luck = hash(int((h * 4) / 3)) % 100
-    ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
+    ap = hash(int(((luck * 100) * (rp) * (r / 4 % 100)))) % 100
     wm_value = []
     good_value = {}
     bad_value = {}
@@ -601,6 +603,39 @@ async def _(event: Event, message: Message = EventMessage()):
             MessageSegment("text", {"text": s.strip()})
         ]))
 
+def find_music_alias(music_id: int) -> List[str]:
+    url = "https://download.fanyu.site/maimai/alias.json"
+    response = requests.get(url)
+    search_data = response.json()
+    alias_list: List[str] = []
+    for alias, ids in search_data.items():
+        if str(music_id) in ids:
+            alias_list.append(alias)
+    return alias_list
+
+find_alias = on_command('查看别名 ')
+
+@find_alias.handle()
+async def _(event: Event, message: Message = CommandArg()):
+    nickname = event.sender.nickname
+    argv = str(message).strip().split(" ")
+    url = "https://download.fanyu.site/maimai/alias.json"
+    response = requests.get(url)
+    if response.status_code != 200:
+        await find_alias.finish(f"▿ [Sender: {nickname}]\n  Alias List | 别名列表 - 错误\n别名数据库错误，请检查Suzuno设置。错误代码：{response.status_code}\n")
+        return
+    music_alias = find_music_alias(argv)
+    if music_alias == []:
+        await find_alias.finish(f"▿ [Sender: {nickname}]\n  Alias List | 别名列表 - 错误\n该歌曲没有别名/不存在\n")
+        return
+    else:
+        list_temp = total_list.by_id(argv)
+        s = f"▾ [Sender: {nickname}]\n  Alias List | 别名列表 - {list_temp['id']}.{list_temp['title']}的别名有："
+        for alias in music_alias:
+            s += f"\n{alias}"
+        await find_alias.finish(Message([
+            MessageSegment("text", {"text": s.strip()})
+        ]))
 
 query_score = on_command('分数线')
 

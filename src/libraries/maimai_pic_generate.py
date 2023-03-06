@@ -94,7 +94,7 @@ async def jrwm_pic(qq: int) -> Optional[Image.Image]:
     random_numbers[combined] = rp
     save_random_numbers(random_numbers)
     luck = hash(int((h * 4) / 3)) % 100
-    ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
+    ap = hash(int(((luck * 100) * (rp) * (r / 4 % 100)))) % 100
     wm_value = []
     good_value = {}
     bad_value = {}

@@ -33,7 +33,7 @@ helper = on_command('help')
 
 @helper.handle()
 async def _(event: Event, message: Message = CommandArg()):
-    about_str = f"▾ Getting Started | 上手帮助\n您可以查询以下模块的指令帮助，部分功能是否可用取决于您所在的群管理员的设置。\n关于铃乃: about\nMaimai DX 模块: maimai.help\n跑团/COC 模块: .help\nArcaea 模块: arc help\n其它功能: public.help\n群管理模块(未启用): admin.help\n铃乃漂流社区(未启用): community.help\nSuzuno系统设置: sys.help"
+    about_str = f"▾ Getting Started | 上手帮助\n您可以查询以下模块的指令帮助，部分功能是否可用取决于您所在的群管理员的设置。\n关于铃乃: about\nMaimai DX 模块: maimai.help\n跑团/COC 模块: .help\nArcaea 模块: /arc help\n其它功能: public.help\n群管理模块(未启用): admin.help\n铃乃漂流社区(未启用): community.help\nSuzuno系统设置: sys.help"
     await helper.send(Message([
         MessageSegment("text", {"text": about_str})
     ]))
