@@ -175,11 +175,14 @@ class MusicList(List[Music]):
 def get_music_list():
     requests.DEFAULT_RETRIES = 10
     obj_data = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
-    obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()
+    obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()['charts']
     _total_list: MusicList = MusicList(obj_data)
     for __i in range(len(_total_list)):
         _total_list[__i] = Music(_total_list[__i])
-        _total_list[__i]['stats'] = obj_stats[_total_list[__i].id]
+        try:
+            _total_list[__i]['stats'] = obj_stats[_total_list[__i].id]
+        except:
+            _total_list[__i]['stats'] = obj_stats['8']
         for __j in range(len(_total_list[__i].charts)):
             _total_list[__i].charts[__j] = Chart(_total_list[__i].charts[__j])
             _total_list[__i].stats[__j] = Stats(_total_list[__i].stats[__j])
