@@ -51,7 +51,7 @@ class Stats(Dict):
     count: Optional[int] = None
     avg: Optional[float] = None
     sss_count: Optional[int] = None
-    difficulty: Optional[str] = None
+    difficulty: Optional[float] = None
     rank: Optional[int] = None
     total: Optional[int] = None
 
@@ -64,7 +64,7 @@ class Stats(Dict):
             return self['t']
         elif item == 'difficulty':
             try:
-                return self['tag']
+                return self['fit_diff']
             except:
                 return "--"
         elif item in self:
@@ -175,14 +175,11 @@ class MusicList(List[Music]):
 def get_music_list():
     requests.DEFAULT_RETRIES = 10
     obj_data = requests.get('https://www.diving-fish.com/api/maimaidxprober/music_data').json()
-    obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()['charts']
+    obj_stats = requests.get('https://www.diving-fish.com/api/maimaidxprober/chart_stats').json()
     _total_list: MusicList = MusicList(obj_data)
     for __i in range(len(_total_list)):
         _total_list[__i] = Music(_total_list[__i])
-        try:
-            _total_list[__i]['stats'] = obj_stats[_total_list[__i].id]
-        except:
-            _total_list[__i]['stats'] = obj_stats['8']
+        _total_list[__i]['stats'] = obj_stats['charts'][_total_list[__i].id]
         for __j in range(len(_total_list[__i].charts)):
             _total_list[__i].charts[__j] = Chart(_total_list[__i].charts[__j])
             _total_list[__i].stats[__j] = Stats(_total_list[__i].stats[__j])

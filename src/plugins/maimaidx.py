@@ -92,7 +92,7 @@ b40 | b50    ->    根据查分器数据生成您的或指定账户的 Best 40 /
 
 底分分析 | rating分析 <用户名>    ->    Best 40 的底分分析                                        
 
-setplate    ->    更改在您自主查询B40/B50时在姓名框显示的牌子。
+设置牌子 | setplate    ->    更改在您自主查询B40/B50时在姓名框显示的牌子。
 
 设置称号 | settitle <查分器昵称> <自定义称号>   ->    设置自定义称号。
 
@@ -393,7 +393,7 @@ async def _(event: Event, message: Message = CommandArg()):
     random.seed(h)
     r = random.random()
     rp = hash(str(r) + str(combined)) % 100
-
+    
     if combined in random_numbers:
         rp = random_numbers[combined]
 
@@ -603,6 +603,7 @@ async def _(event: Event, message: Message = EventMessage()):
             MessageSegment("text", {"text": s.strip()})
         ]))
 
+
 def find_music_alias(music_id: int) -> List[str]:
     url = "https://download.fanyu.site/maimai/alias.json"
     response = requests.get(url)
@@ -612,6 +613,7 @@ def find_music_alias(music_id: int) -> List[str]:
         if str(music_id) in ids:
             alias_list.append(alias)
     return alias_list
+
 
 find_alias = on_command('查看别名 ')
 
@@ -736,8 +738,13 @@ async def _(event: Event, message: Message = CommandArg()):
         else:
             qq = str(data[0])
     if platenum == "":
-        await setplate.finish(f"▿ [Sender: {nickname}]\n  Plate Changer | 更换名牌板\n除将/极/神/舞舞牌子需要您查询一次清谱后自动为您更换外，您还可以使用‘setplate 对应数字’更换普通名牌板。\n铃乃当前收录的普通名牌板如下(持续更新):\n0.默认\n1.maimai でらっくす\n2.全国制霸 でらっくす\n3.はっぴー（ゆにばーす）\n4.东方Projectちほー\n5.炎炎ノ消防队ちほー\n6.でらっくすちほー おしゃま牛乳\n另外内置了一个彩蛋牌子，是 KING of Performai 3rd ファイナリスト，提示是“21、11、9”。")
-    elif int(platenum) < 0 and int(platenum) > 6 and int(platenum) != 1001:
+        helpimage = Image.open(os.path.join('src/static/mai/pic', f"platehelp.png"))
+        helpdata=f"base64://{str(image_to_base64(helpimage), encoding='utf-8')}"
+        await setplate.finish(Message([
+            MessageSegment.text(f"▿ [Sender: {nickname}]\n  Plate Changer | 更换名牌板\n除将/极/神/舞舞牌子需要您查询一次清谱后自动为您更换外，您还可以使用‘setplate 名牌编号’更换普通名牌板。\n铃乃当前收录的普通名牌板如下(持续更新):\n"),
+            MessageSegment.image(helpdata)
+        ]))
+    elif int(platenum) < 0 and int(platenum) > 33 and int(platenum) != 1001:
         await setplate.finish(f"▿ [Sender: {nickname}]\n  Plate Changer | 更换名牌板\n请输入正确的名牌板号码。")
     else:
         await c.execute(f'select * from plate_table where id="{qq}"')
@@ -747,7 +754,9 @@ async def _(event: Event, message: Message = CommandArg()):
         else:
             await c.execute(f'update plate_table set platenum={platenum} where id={qq}')
         await db.commit()
-        await setplate.finish(f"▾ [Sender: {nickname}]\n   Plate Changer | 更换名牌板\n更换完成。")
+        await setplate.finish(Message([
+            MessageSegment.text(f"▾ [Sender: {nickname}]\n   Plate Changer | 更换名牌板\n更换完成。")
+        ]))
     
 settitle = on_command('设置称号', aliases={'settitle'})
 
