@@ -20,14 +20,11 @@ plate_to_version = {
         '雪': 'MiLK PLUS',
         '輝': 'maimai FiNALE',
         '辉': 'maimai FiNALE',
-        '舞': 'ALL FiNALE',
         '熊': 'maimai でらっくす',
         '華': 'maimai でらっくす PLUS',
         '华': 'maimai でらっくす PLUS',
         '爽': 'maimai でらっくす Splash',
-        '煌': 'maimai でらっくす Splash PLUS',
-        '宙': 'maimai でらっくす UNiVERSE',
-        '星': 'maimai でらっくす UNiVERSE PLUS'
+        '煌': 'maimai でらっくす Splash PLUS'
 }
 
 
