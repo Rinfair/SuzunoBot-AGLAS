@@ -12,7 +12,7 @@ import json
 import requests
 import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
-from src.libraries.maimaidx_music import get_cover_len4_id, total_list
+from src.libraries.maimaidx_music import get_cover_len5_id, total_list
 from src import static
 
 
@@ -337,11 +337,11 @@ class DrawBest(object):
             i = num // 5
             j = num % 5
             chartInfo = sdBest[num]
-            pngPath = os.path.join(self.cover_dir, f'{chartInfo.idNum}.png')
+            pngPath = os.path.join(self.cover_dir, f'{get_cover_len5_id(chartInfo.idNum)}.png')
             if not os.path.exists(pngPath):
-                pngPath = os.path.join(self.cover_dir, f'{chartInfo.idNum}.jpg')
+                pngPath = os.path.join(self.cover_dir, f'{get_cover_len5_id(chartInfo.idNum)}.jpg')
             if not os.path.exists(pngPath):
-                pngPath = os.path.join(self.cover_dir, '1000.png')
+                pngPath = os.path.join(self.cover_dir, '01000.png')
             temp = Image.open(pngPath).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0]) 
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
@@ -426,7 +426,7 @@ class DrawBest(object):
         for num in range(len(sdBest), sdBest.size):
             i = num // 5
             j = num % 5
-            temp = Image.open(os.path.join(self.cover_dir, f'1000.png')).convert('RGB')
+            temp = Image.open(os.path.join(self.cover_dir, f'01000.png')).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(2))
@@ -440,11 +440,11 @@ class DrawBest(object):
             i = num // 5 
             j = num % 5
             chartInfo = dxBest[num]
-            pngPath = os.path.join(self.cover_dir, f'{int(chartInfo.idNum)}.png')
+            pngPath = os.path.join(self.cover_dir, f'{get_cover_len5_id(chartInfo.idNum)}.png')
             if not os.path.exists(pngPath):
-                pngPath = os.path.join(self.cover_dir, f'{int(chartInfo.idNum)}.jpg')
+                pngPath = os.path.join(self.cover_dir, f'{get_cover_len5_id(chartInfo.idNum)}.jpg')
             if not os.path.exists(pngPath):
-                pngPath = os.path.join(self.cover_dir, '1000.png')
+                pngPath = os.path.join(self.cover_dir, '01000.png')
             temp = Image.open(pngPath).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
@@ -531,7 +531,7 @@ class DrawBest(object):
         for num in range(len(dxBest), dxBest.size):
             i = num // 5
             j = num % 5
-            temp = Image.open(os.path.join(self.cover_dir, f'1000.png')).convert('RGB')
+            temp = Image.open(os.path.join(self.cover_dir, f'01000.png')).convert('RGB')
             temp = self._resizePic(temp, itemW / temp.size[0])
             temp = temp.crop((0, (temp.size[1] - itemH) / 2, itemW, (temp.size[1] + itemH) / 2))
             temp = temp.filter(ImageFilter.GaussianBlur(2))
@@ -673,13 +673,17 @@ def computeRa(ds: float, achievement: float, spp: bool = False) -> int:
     elif achievement < 98:
         baseRa = 20.0 if spp else 12.5
     elif achievement < 99:
-        baseRa = 20.0 if spp else 12.7
+        baseRa = 20.3 if spp else 12.7
     elif achievement < 99.5:
         baseRa = 20.8 if spp else 13.0
-    elif achievement < 100:
+    elif achievement < 99.9999:
         baseRa = 21.1 if spp else 13.2
-    elif achievement < 100.5:
+    elif achievement < 100:
+        baseRa = 21.4 if spp else 13.2
+    elif achievement < 100.4999:
         baseRa = 21.6 if spp else 13.5
+    elif achievement < 100.5:
+        baseRa = 22.2 if spp else 13.5
 
     return math.floor(ds * (min(100.5, achievement) / 100) * baseRa)
 

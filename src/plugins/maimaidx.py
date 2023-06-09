@@ -109,21 +109,21 @@ b40 | b50    ->    根据查分器数据生成您的或指定账户的 Best 40 /
 
 def song_txt(music: Music):
     try:
-        fileimage = f"https://www.diving-fish.com/covers/{get_cover_len4_id(music.id)}.jpg"
+        fileimage = f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.jpg"
         imagedata = Image.open(BytesIO(fileimage.content)).convert('RGBA')
         sentimagedata = f"base64://{str(image_to_base64(imagedata), encoding='utf-8')}"
     except:
         try:
-            fileimage = f"https://www.diving-fish.com/covers/{get_cover_len4_id(music.id)}.png"
+            fileimage = f"https://www.diving-fish.com/covers/{get_cover_len5_id(music.id)}.png"
             imagedata = Image.open(BytesIO(fileimage.content)).convert('RGBA')
             sentimagedata = f"base64://{str(image_to_base64(imagedata), encoding='utf-8')}"
         except:
             try:
-                fileimage = Image.open(os.path.join('src/static/mai/cover/', f"{music['id']}.jpg"))
+                fileimage = Image.open(os.path.join('src/static/mai/cover/', f"{get_cover_len5_id(music['id'])}.jpg"))
                 sentimagedata = f"base64://{str(image_to_base64(fileimage), encoding='utf-8')}"
             except:
                 try:
-                    fileimage = Image.open(os.path.join('src/static/mai/cover/', f"{music['id']}.png"))
+                    fileimage = Image.open(os.path.join('src/static/mai/cover/', f"{get_cover_len5_id(music['id'])}.png"))
                     sentimagedata = f"base64://{str(image_to_base64(fileimage), encoding='utf-8')}"
                 except:
                     fileimage = Image.open(os.path.join('src/static/mai/pic/', f"noimage.png"))
