@@ -1359,9 +1359,9 @@ async def _(event: Event, message: Message = EventMessage()):
             music = total_list.by_id(str(song[0]))
             if music.ds[song[1]] > 13.6:
                 try:
-                    song_remain_difficult.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
+                    song_remain_difficult.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], "{:.2f}".format(music.stats[song[1]].fit_diff, song[1])])
                 except:
-                    song_remain_difficult.append([music.id, music.title, "--", music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
+                    song_remain_difficult.append([music.id, music.title, "--", music.ds[song[1]], "{:.2f}".format(music.stats[song[1]].fit_diff, song[1])])
         bsccomplete = 100 - (len(song_remain_basic) / total_music_num * 100)
         advcomplete = 100 - (len(song_remain_advanced) / total_music_num * 100)
         expcomplete = 100 - (len(song_remain_expert) / total_music_num * 100)
@@ -1438,7 +1438,7 @@ Master | 已完成 {mascomplete:.2f}%, 待完成 {len(song_remain_master)} 首 /
                                 self_record = syncRank[sync_rank.index(player_data['verlist'][record_index]['fs'])].upper()
                     if res.groups()[0] in ['真'] and s[0] == 70:
                         continue
-                    msg += f'Track {m.id} > {m.title} | {diffs[s[1]]}\n定数: {m.ds[s[1]]} 相对难度: {m.stats[s[1]].difficulty} {"当前达成率: " if self_record else ""}{self_record}'.strip() + '\n\n'
+                    msg += f'Track {m.id} > {m.title} | {diffs[s[1]]}\n定数: {m.ds[s[1]]} 相对难度: {"{:.2f}".format(m.stats[s[1]].fit_diff)} {"当前达成率: " if self_record else ""}{self_record}'.strip() + '\n\n'
             else:
                 msg += f'恭喜{res.groups()[0]}{res.groups()[1]}确定！已经没有大于 13+ 及其以上的谱面了,加油!!\n'
         else:
@@ -1574,9 +1574,9 @@ async def _(event: Event, message: Message = EventMessage()):
         for song in song_remain:
             music = total_list.by_id(str(song[0]))
             try:
-                songs.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
+                songs.append([music.id, music.title, diffs[song[1]], music.ds[song[1]], "{:.2f}".format(music.stats[song[1]].fit_diff, song[1])])
             except:
-                songs.append([music.id, music.title, "--", music.ds[song[1]], music.stats[song[1]].difficulty, song[1]])
+                songs.append([music.id, music.title, "--", music.ds[song[1]], "{:.2f}".format(music.stats[song[1]].fit_diff, song[1])])
         msg = ''
         if len(song_remain) > 0:
             if len(song_remain) < 50:
@@ -1680,20 +1680,20 @@ async def _(event: Event, message: Message = EventMessage()):
                         if [int(music.id), j] in player_dx_id_list:
                             player_ra = player_dx_list[player_dx_id_list.index([int(music.id), j])][2]
                             if music_ra - player_ra == int(res.groups()[1]) and [int(music.id), j, music_ra] not in player_dx_list:
-                                music_dx_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, music.stats[j].difficulty])
+                                music_dx_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, "{:.2f}".format(music.stats[j].fit_diff)])
                         else:
                             if music_ra - dx_ra_lowest == int(res.groups()[1]) and [int(music.id), j, music_ra] not in player_dx_list:
-                                music_dx_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, music.stats[j].difficulty])
+                                music_dx_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, "{:.2f}".format(music.stats[j].fit_diff)])
                     else:
                         music_ra = computeRa(ds, achievement)
                         if music_ra < sd_ra_lowest: continue
                         if [int(music.id), j] in player_sd_id_list:
                             player_ra = player_sd_list[player_sd_id_list.index([int(music.id), j])][2]
                             if music_ra - player_ra == int(res.groups()[1]) and [int(music.id), j, music_ra] not in player_sd_list:
-                                music_sd_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, music.stats[j].difficulty])
+                                music_sd_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, "{:.2f}".format(music.stats[j].fit_diff)])
                         else:
                             if music_ra - sd_ra_lowest == int(res.groups()[1]) and [int(music.id), j, music_ra] not in player_sd_list:
-                                music_sd_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, music.stats[j].difficulty])
+                                music_sd_list.append([music, diffs[j], ds, achievement, scoreRank[i + 1].upper(), music_ra, "{:.2f}".format(music.stats[j].fit_diff)])
         if len(music_dx_list) == 0 and len(music_sd_list) == 0:
             await rise_score.send(f"▿ [Sender: {nickname}]\n  铃乃的锦囊 - 无匹配乐曲\n没有找到这样的乐曲。")
             return
@@ -1703,12 +1703,12 @@ async def _(event: Event, message: Message = EventMessage()):
         msg = f'▼ [Sender: {nickname}]\n  铃乃的锦囊 - 升 {res.groups()[1]} 分攻略\n'
         if len(music_sd_list) != 0:
             msg += f'----- B25 区域升分推荐 (旧版本乐曲) -----\n'
-            for music, diff, ds, achievement, rank, ra, difficulty in sorted(music_sd_list, key=lambda i: int(i[0]['id'])):
-                msg += f'Track {music["id"]}> {music["title"]} | {diff}\n定数: {ds} 要求的达成率: {achievement} 分数线: {rank} Rating: {ra} 相对难度: {difficulty}\n\n'
+            for music, diff, ds, achievement, rank, ra, fit_diff in sorted(music_sd_list, key=lambda i: int(i[0]['id'])):
+                msg += f'Track {music["id"]}> {music["title"]} | {diff}\n定数: {ds} 要求的达成率: {achievement} 分数线: {rank} Rating: {ra} 相对难度: {fit_diff}\n\n'
         if len(music_dx_list) != 0:
             msg += f'----- B15 区域升分推荐 (当前版本乐曲) -----\n'
-            for music, diff, ds, achievement, rank, ra, difficulty in sorted(music_dx_list, key=lambda i: int(i[0]['id'])):
-                msg += f'Track {music["id"]}> {music["title"]} | {diff}\n定数: {ds} 要求的达成率: {achievement} 分数线: {rank} Rating: {ra} 相对难度: {difficulty}\n\n'
+            for music, diff, ds, achievement, rank, ra, fit_diff in sorted(music_dx_list, key=lambda i: int(i[0]['id'])):
+                msg += f'Track {music["id"]}> {music["title"]} | {diff}\n定数: {ds} 要求的达成率: {achievement} 分数线: {rank} Rating: {ra} 相对难度: {fit_diff}\n\n'
         await rise_score.send(MessageSegment.image(f"base64://{image_to_base64(text_to_image(msg.strip())).decode()}"))
 
 base = on_command("底分分析", aliases={"rating分析"})

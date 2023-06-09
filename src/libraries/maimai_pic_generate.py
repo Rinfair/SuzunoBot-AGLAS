@@ -218,7 +218,7 @@ async def charts_info(id: str, level_index: int) -> (Optional[Image.Image]):
     image = Image.open(os.path.join(pic_dir, f'1{pic}.png')).convert('RGBA')
     image = image.resize((int(image.size[0] * 1), int(image.size[1] * 1)))
     try:
-        tag = stats['difficulty']
+        tag = "{:.2f}".format(stats['fit_diff'])
     except:
         tag = "Insufficient"
     try:

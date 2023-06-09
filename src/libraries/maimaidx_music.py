@@ -1,9 +1,10 @@
 import json
 import random
-from typing import Dict, List, Optional, Union, Tuple, Any
 from copy import deepcopy
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
+
 
 def cross(checker: List[Any], elem: Optional[Union[Any, List[Any]]], diff):
     ret = False
@@ -51,7 +52,7 @@ class Stats(Dict):
     count: Optional[int] = None
     avg: Optional[float] = None
     sss_count: Optional[int] = None
-    difficulty: Optional[float] = None
+    fit_diff: Optional[float] = None
     rank: Optional[int] = None
     total: Optional[int] = None
 
@@ -62,9 +63,9 @@ class Stats(Dict):
             return self['v'] + 1
         elif item == 'total':
             return self['t']
-        elif item == 'difficulty':
+        elif item == 'fit_diff':
             try:
-                return round(float(self['fit_diff']), 2)
+                return self['fit_diff']
             except:
                 return "--"
         elif item in self:
