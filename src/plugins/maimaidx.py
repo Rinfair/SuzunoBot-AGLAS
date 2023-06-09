@@ -877,9 +877,9 @@ async def _(event: Event, message: Message = CommandArg()):
         await best_40_pic.send(f'▿ [Sender: {nickname}]\n  Best 40: Banned | 被禁止\n{username} 不允许使用此方式查询 Best 40。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b40”。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
         if username == "":
-            text = f'▾ [Sender: {nickname}]\n  Best 40 Details | 我的 B40\n您的 Best 40 如图所示。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
+            text = f'▾ [Sender: {nickname}]\n  Best 40 Details | 我的 B40\n您的 Best 40 如图所示。\nBest 40 是 DX Splash Plus 以前版本的定数方法（对应国服DX2022），与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 50。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
         else:
-            text = f'▾ [Sender: {nickname}]\n  Best 40 Details | {username} 的 B40\n此 ID 的 Best 40 如图所示。\n'
+            text = f'▾ [Sender: {nickname}]\n  Best 40 Details | {username} 的 B40\n此 ID 的 Best 40 如图所示。\nBest 40 是 DX Splash Plus 以前版本的定数方法（对应国服DX2022），与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 50。'
         await best_40_pic.send(Message([
             MessageSegment.reply(event.message_id),
             MessageSegment.text(text),
@@ -953,9 +953,9 @@ async def _(event: Event, message: Message = CommandArg()):
         await best_50_pic.send(f'▿ [Sender: {nickname}]\n  Best 50: Banned | 被禁止\n{username} 不允许使用此方式查询 Best 50。\n如果是您的账户，请检查您的QQ是否与查分器绑定正确后直接输入“b50”。\n您需要修改查分器设置吗？请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/')
     else:
         if username == "":
-            text = f'▾ [Sender: {nickname}]\n  Best 50 Details | 我的 B50\n您的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
+            text = f'▾ [Sender: {nickname}]\n  Best 50 Details | 我的 B50\n您的 Best 50 如图所示。\n若您需要修改查分器数据，请参阅:\nhttps://www.diving-fish.com/maimaidx/prober/'
         else:
-            text = f'▾ [Sender: {nickname}]\n  Best 50 Details | {username} 的 B50\n此 ID 的 Best 50 如图所示。\nBest 50 是 DX Splash Plus 及以后版本的定数方法，与当前版本的定数方法不相同。若您需要当前版本定数，请使用 Best 40。'
+            text = f'▾ [Sender: {nickname}]\n  Best 50 Details | {username} 的 B50\n此 ID 的 Best 50 如图所示。\n'
         await best_50_pic.send(Message([
             MessageSegment.reply(event.message_id),
             MessageSegment.text(text),
