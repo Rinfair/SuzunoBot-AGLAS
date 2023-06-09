@@ -2,7 +2,7 @@ import random
 from typing import Dict, List
 from src.libraries.image import image_to_base64
 from PIL import ImageFont, ImageDraw, Image
-from src.libraries.maimaidx_music import get_cover_len4_id
+from src.libraries.maimaidx_music import get_cover_len5_id
 import os
 import requests
 
@@ -24,11 +24,11 @@ class GuessObject:
             f"的 BPM 是 {self.music['basic_info']['bpm']}"
         ]
         self.guess_options = random.sample(self.guess_options, 6)
-        pngPath = cover_dir + f"{int(self.music['id'])}.png"
+        pngPath = cover_dir + f"{get_cover_len5_id(self.music['id'])}.png"
         if not os.path.exists(pngPath):
-            pngPath = cover_dir + f"{int(self.music['id'])}.jpg"
+            pngPath = cover_dir + f"{get_cover_len5_id(self.music['id'])}.jpg"
         if not os.path.exists(pngPath):
-            pngPath = cover_dir + '1000.png'
+            pngPath = cover_dir + '01000.png'
         img = Image.open(pngPath)
         w, h = img.size
         w2, h2 = int(w / 3), int(h / 3)

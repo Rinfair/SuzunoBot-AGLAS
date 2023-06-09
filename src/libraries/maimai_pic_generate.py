@@ -10,7 +10,7 @@ import json
 import requests
 import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from src.libraries.maimaidx_music import get_cover_len4_id, total_list
+from src.libraries.maimaidx_music import get_cover_len5_id, total_list
 from src import static
 import datetime, random, pickle
 
@@ -170,16 +170,16 @@ async def jrwm_pic(qq: int) -> Optional[Image.Image]:
     imageDraw.text((110, 1425), f"{tips_list[tips_value]}", 'black', fonttips)
     music = total_list[hash(qq) % len(total_list)]
     try:
-        file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
+        file = requests.get(f"https://www.diving-fish.com/covers/{get_cover_len5_id(music['id'])}.jpg")
         imagedata = Image.open(BytesIO(file.content)).convert('RGBA')
         imagedata = imagedata.resize((int(400), int(400)))
     except:
          try:
              pic_cover = 'src/static/mai/cover/'
              try:
-                imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.jpg")).convert('RGBA')
+                imagedata = Image.open(os.path.join(pic_cover, f"{get_cover_len5_id(music['id'])}.jpg")).convert('RGBA')
              except:
-                imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.png")).convert('RGBA')
+                imagedata = Image.open(os.path.join(pic_cover, f"{get_cover_len5_id(music['id'])}.png")).convert('RGBA')
              imagedata = imagedata.resize((int(400), int(400)))
          except:
              imagedata = Image.open(os.path.join(pic_dir, f'noimage.png')).convert('RGBA')
@@ -222,16 +222,16 @@ async def charts_info(id: str, level_index: int) -> (Optional[Image.Image]):
     except:
         tag = "Insufficient"
     try:
-        file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
+        file = requests.get(f"https://www.diving-fish.com/covers/{get_cover_len5_id(music['id'])}.jpg")
         imagedata = Image.open(BytesIO(file.content)).convert('RGBA')
         imagedata = imagedata.resize((int(600), int(600)))
     except:
         try:
             pic_cover = 'src/static/mai/cover/'
             try:
-                imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.jpg")).convert('RGBA')
+                imagedata = Image.open(os.path.join(pic_cover, f"{get_cover_len5_id(music['id'])}.jpg")).convert('RGBA')
             except:
-                imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.png")).convert('RGBA')
+                imagedata = Image.open(os.path.join(pic_cover, f"{get_cover_len5_id(music['id'])}.png")).convert('RGBA')
             imagedata = imagedata.resize((int(600), int(600)))
         except:
             imagedata = Image.open(os.path.join(pic_dir, f'noimage.png')).convert('RGBA')
@@ -356,16 +356,16 @@ async def music_info(id: str) -> (Optional[Image.Image]):
     pic_dir = 'src/static/mai/pic/'         
     baseimage = Image.open(os.path.join(pic_dir, f'id.png')).convert('RGBA')
     try:
-        file = requests.get(f"https://www.diving-fish.com/covers/{music['id']}.jpg")
+        file = requests.get(f"https://www.diving-fish.com/covers/{get_cover_len5_id(music['id'])}.jpg")
         imagedata = Image.open(BytesIO(file.content)).convert('RGBA')
         imagedata = imagedata.resize((int(600), int(600)))
     except:
         try:
             pic_cover = 'src/static/mai/cover/'
             try:
-                imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.jpg")).convert('RGBA')
+                imagedata = Image.open(os.path.join(pic_cover, f"{get_cover_len5_id(music['id'])}.jpg")).convert('RGBA')
             except:
-                imagedata = Image.open(os.path.join(pic_cover, f"{music['id']}.png")).convert('RGBA')
+                imagedata = Image.open(os.path.join(pic_cover, f"{get_cover_len5_id(music['id'])}.png")).convert('RGBA')
             imagedata = imagedata.resize((int(600), int(600)))
         except:
             imagedata = Image.open(os.path.join(pic_dir, f'noimage.png')).convert('RGBA')

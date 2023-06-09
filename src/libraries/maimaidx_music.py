@@ -191,8 +191,8 @@ def get_music_list():
 
 total_list = get_music_list()
 
-def get_cover_len4_id(mid) -> str:
+def get_cover_len5_id(mid) -> str:
     mid = int(mid)
-    if 10001 <= mid:
+    if mid > 10000 and mid <= 11000:
         mid -= 10000
-    return f'{mid:04d}'
+    return f'{mid:05d}'
