@@ -64,7 +64,7 @@ class Stats(Dict):
             return self['t']
         elif item == 'difficulty':
             try:
-                return self['fit_diff']
+                return round(float(self['fit_diff']), 2)
             except:
                 return "--"
         elif item in self:
