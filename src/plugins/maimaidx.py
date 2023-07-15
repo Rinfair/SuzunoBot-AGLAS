@@ -563,7 +563,7 @@ async def _(event: Event, message: Message = CommandArg()):
 
 
 def find_music_id(title: str) -> List[int]:
-    url = "https://download.fanyu.site/maimai/alias.json"
+    url = "https://download.fanyu.site/maimai/alias_uc.json"
     response = requests.get(url)
     maimai_data = response.json()
     music_id = maimai_data.get(title.lower(), None)
@@ -580,7 +580,7 @@ async def _(event: Event, message: Message = EventMessage()):
     regex = "(.+)是什么歌"
     name = re.match(regex, str(message)).groups()[0].strip().lower()
     nickname = event.sender.nickname
-    url = "https://download.fanyu.site/maimai/alias.json"
+    url = "https://download.fanyu.site/maimai/alias_uc.json"
     response = requests.get(url)
     if response.status_code != 200:
         await find_song.finish(f"▿ [Sender: {nickname}]\n  Search | 查歌 - 错误\n别名数据库错误，请检查Suzuno设置。错误代码：{response.status_code}\n")
@@ -605,7 +605,7 @@ async def _(event: Event, message: Message = EventMessage()):
 
 
 def find_music_alias(music_id: int) -> List[str]:
-    url = "https://download.fanyu.site/maimai/alias.json"
+    url = "https://download.fanyu.site/maimai/alias_uc.json"
     response = requests.get(url)
     search_data = response.json()
     alias_list: List[str] = []
@@ -621,7 +621,7 @@ find_alias = on_command('查看别名 ')
 async def _(event: Event, message: Message = CommandArg()):
     nickname = event.sender.nickname
     argv = str(message).strip()
-    url = "https://download.fanyu.site/maimai/alias.json"
+    url = "https://download.fanyu.site/maimai/alias_uc.json"
     response = requests.get(url)
     if response.status_code != 200:
         await find_alias.finish(f"▿ [Sender: {nickname}]\n  Alias List | 别名列表 - 错误\n别名数据库错误，请检查Suzuno设置。错误代码：{response.status_code}\n")
