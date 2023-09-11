@@ -1,5 +1,12 @@
 # SuzunoBot-AGLAS 更新日志 Changelog
 
+## [v2.1 Alpha]-常规维护
+
+- 修复以日期为基准的随机数生成算法
+- 适配Nonebot 2.0.0
+- 移除ChatGPT模块{后续更新ChatLLM}
+- 完善别名查找算法（新增错误处理）
+
 ## [v2.0.1 Beta 1.0]-内容更新
 
 - 新增文字、头像表情包插件[nonebot-plugin-petpet](https://github.com/noneplugin/nonebot-plugin-petpet)和[nonebot-plugin-memes](https://github.com/noneplugin/nonebot-plugin-memes)
