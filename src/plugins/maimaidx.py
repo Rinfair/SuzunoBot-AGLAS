@@ -388,17 +388,16 @@ async def _(event: Event, message: Message = CommandArg()):
     check_date()
     today = get_today()
     qq = int(event.get_user_id())
-    combined = (qq, today)
-    h = hash(str(qq) + today)
+    h = hash(qq)
     random.seed(h)
     r = random.random()
-    rp = hash(str(r) + str(combined)) % 100
+    rp = hash(int(r) + h) % 100
     
-    if combined in random_numbers:
-        rp = random_numbers[combined]
+    if (qq, today) in random_numbers:
+        rp = random_numbers[(qq, today)]
 
     nickname = event.sender.nickname
-    random_numbers[combined] = rp
+    random_numbers[(qq, today)] = rp
     save_random_numbers(random_numbers)
     xp = random.randint(0,32)
     s = f"▾ [Sender: {nickname}]\n  今日性癖\n{nickname}今天的性癖是{xp_list[xp]}，人品值是{rp}%.\n不满意的话再随一个吧！"
@@ -432,17 +431,16 @@ async def _(event: Event, message: Message = CommandArg()):
     check_date()
     today = get_today()
     qq = int(event.get_user_id())
-    combined = (qq, today)
-    h = hash(str(qq) + today)
+    h = hash(qq)
     random.seed(h)
     r = random.random()
-    rp = hash(str(r) + str(combined)) % 100
+    rp = hash(int(r) + h) % 100
 
-    if combined in random_numbers:
-        rp = random_numbers[combined]
+    if (qq, today) in random_numbers:
+        rp = random_numbers[(qq, today)]
 
     nickname = event.sender.nickname
-    random_numbers[combined] = rp
+    random_numbers[rp] = rp
     save_random_numbers(random_numbers)
     luck = hash(int((h * 4) / 3)) % 100
     ap = hash(int(((luck * 100) * (rp) * (r / 4 % 100)))) % 100
@@ -527,17 +525,16 @@ async def _(event: Event, message: Message = CommandArg()):
     check_date()
     today = get_today()
     qq = int(event.get_user_id())
-    combined = (qq, today)
-    h = hash(str(qq) + today)
+    h = hash(qq)
     random.seed(h)
     r = random.random()
-    rp = hash(str(r) + str(combined)) % 100
+    rp = hash(int(r) + h) % 100
     
-    if combined in random_numbers:
-        rp = random_numbers[combined]
+    if (qq, today) in random_numbers:
+        rp = random_numbers[(qq, today)]
         
     nickname = event.sender.nickname
-    random_numbers[combined] = rp
+    random_numbers[(qq, today)] = rp
     save_random_numbers(random_numbers)
     luck = hash(int((h * 4) / 3)) % 100
     ap = hash(int(((luck * 100) * (rp) * (hash(qq) / 4 % 100)))) % 100
@@ -581,7 +578,8 @@ async def _(event: Event, message: Message = EventMessage()):
     name = re.match(regex, str(message)).groups()[0].strip().lower()
     nickname = event.sender.nickname
     url = "https://download.fanyu.site/maimai/alias_uc.json"
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
     if response.status_code != 200:
         await find_song.finish(f"▿ [Sender: {nickname}]\n  Search | 查歌 - 错误\n别名数据库错误，请检查Suzuno设置。错误代码：{response.status_code}\n")
         return
@@ -601,6 +599,10 @@ async def _(event: Event, message: Message = EventMessage()):
             s += f"\nNo: {resultnum} | ♪ {list_temp['id']} >\n{list_temp['title']}"
         await find_song.finish(Message([
             MessageSegment("text", {"text": s.strip()})
+        ]))
+    except:
+        await find_song.finish(Message([
+            MessageSegment("text", {"text": "▾ [Sender: {nickname}]\n  Exception Occurred | 在查询过程中发生错误：错误代码[{segment.errorcode}]"})
         ]))
 
 

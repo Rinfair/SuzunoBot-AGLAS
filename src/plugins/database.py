@@ -4,7 +4,7 @@ import asyncio
 import nonebot
 from nonebot.log import logger
 
-driver: nonebot.Driver = nonebot.get_driver()
+driver = nonebot.get_driver()
 config: nonebot.config.Config = driver.config
 
 
