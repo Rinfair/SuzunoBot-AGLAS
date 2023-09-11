@@ -772,26 +772,3 @@ def generate_text(session_id, prompt):
     except Exception as e:
         print(e)
         return f"发生错误: {str(e)}"
-
-
-chatgpt = on_command("/chat ")
-@chatgpt.handle()
-async def _(event: MessageEvent, arg: Message = CommandArg()):
-    if config == None:
-        await chatgpt.finish(f"▿ Suzuno异常，请检查配置文件。")
-        return
-    nickname = event.sender.nickname
-    session_id = event.get_session_id()
-    prompt = arg.extract_plain_text().strip()
-    logger.debug(f"{session_id} {prompt}")
-    await chatgpt.send(Message([
-        MessageSegment.text(f"▿ [Sender: {nickname}]\n  Suzuno正在生成回复，请稍后。\n"),
-        MessageSegment.text(f"AGLAS安全警告：Suzuno的回复完全由GPT-3.5模型生成，代码来源于AGLAS Lambda分支，因此其回答可能存在不适当的内容。\n"),
-        MessageSegment.text(f"因此，请不要使用该功能生成可能违反当地法律法规的答案。")
-    ]))
-    answer = await asyncio.get_event_loop().run_in_executor(None, generate_text, session_id, prompt)
-    await chatgpt.send(Message([
-        MessageSegment.reply(event.message_id),
-        MessageSegment.text(f"▾ [Sender: {nickname}]\nSuzuno的回复：\n"),
-        MessageSegment.text(answer)
-    ]))
