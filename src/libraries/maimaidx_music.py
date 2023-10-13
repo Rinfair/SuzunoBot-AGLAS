@@ -183,7 +183,7 @@ def get_music_list():
         try:
             _total_list[__i]['stats'] = obj_stats['charts'][_total_list[__i].id]
         except:
-            _total_list[__i]['stats'] = obj_stats['charts']['1']
+            _total_list[__i]['stats'] = obj_stats['charts']['8']
         for __j in range(len(_total_list[__i].charts)):
             _total_list[__i].charts[__j] = Chart(_total_list[__i].charts[__j])
             _total_list[__i].stats[__j] = Stats(_total_list[__i].stats[__j])
