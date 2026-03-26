@@ -1,1 +1,7 @@
-test.py
+logs/
+_upstream_rikka/
+_upstream_maimaidx/
+static/
+.venv/
+__pycache__/
+.pytest_cache/
