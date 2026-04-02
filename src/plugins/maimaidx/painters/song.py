@@ -6,105 +6,171 @@ from PIL import Image, ImageDraw
 
 from ..models.song import MaiSong
 from ..score import PlayerMaiScore
-from ._config import ACCENT_COLOR, DIFF_COLORS, FONT_MAIN, FONT_NUM, PANEL_BG, PANEL_BORDER, SUBTEXT_COLOR, TEXT_COLOR
+from .render_core import (
+    BOT_LABEL,
+    PIC_DIR,
+    SIYUAN,
+    TBFONT,
+    TEXT_COLOR,
+    TITLE_COLORS,
+    draw_rating_digits,
+    dx_score_icon,
+    footer_design,
+    full_dx_score,
+    genre_picture,
+    get_image,
+    music_picture,
+    play_bonus_icon,
+    rank_icon,
+    safe_font,
+    song_type_short,
+    song_version_name,
+    type_picture,
+    version_picture,
+)
 from .utils import DrawText, change_column_width, coloum_width
 
 
-def _score_rate_text(score: PlayerMaiScore) -> str:
-    rate = score.rate.value.upper()
-    if rate == "SP":
-        return "S+"
-    if rate == "SSP":
-        return "SS+"
-    if rate == "SSSP":
-        return "SSS+"
-    return rate
+def _score_map(scores: List[PlayerMaiScore]) -> dict[int, PlayerMaiScore]:
+    return {score.song_difficulty.value: score for score in scores}
 
 
-def _candidate_cover_paths(song_id: int):
-    ids = [song_id, song_id + 10000]
-    for sid in ids:
-        yield f"{sid}.png"
-        yield f"{sid:05d}.png"
+def _draw_player_song_info(song: MaiSong, scores: List[PlayerMaiScore]) -> Image.Image:
+    image = get_image(PIC_DIR / "info_bg.png")
+    draw = ImageDraw.Draw(image)
+    tb = DrawText(draw, TBFONT)
+    sy = DrawText(draw, SIYUAN)
+
+    if (logo_path := PIC_DIR / "logo.png").exists():
+        image.alpha_composite(get_image(logo_path).resize((249, 120)), (0, 34))
+
+    cover = get_image(music_picture(song.id)).resize((300, 300))
+    image.alpha_composite(cover, (100, 260))
+
+    genre_path = genre_picture(song.genre)
+    if genre_path is not None:
+        image.alpha_composite(get_image(genre_path).resize((300, 300)), (100, 260))
+
+    version_path = version_picture(song.version)
+    if version_path is not None:
+        image.alpha_composite(get_image(version_path).resize((183, 90)), (295, 205))
+
+    song_type = scores[0].song_type.value if scores else ("dx" if song.difficulties.dx and not song.difficulties.standard else "standard")
+    type_path = type_picture(song_type)
+    if type_path is not None:
+        image.alpha_composite(get_image(type_path).resize((55, 20)), (350, 560))
+
+    artist = song.artist
+    if coloum_width(artist) > 58:
+        artist = change_column_width(artist, 57) + "..."
+    sy.draw(255, 595, 12, artist, TEXT_COLOR, "mm")
+
+    title = song.title
+    if coloum_width(title) > 38:
+        title = change_column_width(title, 37) + "..."
+    sy.draw(255, 622, 18, title, TEXT_COLOR, "mm")
+    tb.draw(160, 720, 22, song.id, TEXT_COLOR, "mm")
+    tb.draw(380, 720, 22, song.bpm, TEXT_COLOR, "mm")
+
+    diffs = song.difficulties.dx if song_type == "dx" else song.difficulties.standard
+    score_by_diff = _score_map(scores)
+
+    step_y = 100
+    for num in range(max(5, len(diffs))):
+        row_y = 235 + step_y * num
+        tab_path = PIC_DIR / f"d-{num}.png"
+        if tab_path.exists():
+            image.alpha_composite(get_image(tab_path), (650, row_y))
+
+        if num < len(diffs):
+            tb.draw(685, 248 + step_y * num, 25, diffs[num].level_value, TEXT_COLOR, "mm")
+        else:
+            sy.draw(800, 302 + step_y * num, 30, "没有该难度", TEXT_COLOR, "mm")
+            continue
+
+        score = score_by_diff.get(num)
+        if score is None:
+            sy.draw(800, 302 + step_y * num, 30, "未游玩", TEXT_COLOR, "mm")
+            continue
+
+        ra_dx_path = PIC_DIR / "ra-dx.png"
+        if ra_dx_path.exists():
+            image.alpha_composite(get_image(ra_dx_path), (850, 272 + step_y * num))
+
+        dx_icon = dx_score_icon(score, width=32, height=19)
+        if dx_icon is not None:
+            image.alpha_composite(dx_icon, (851, 296 + step_y * num))
+        tb.draw(916, 304 + step_y * num, 13, f"{score.dx_score}/{full_dx_score(score)}", TEXT_COLOR, "mm")
+
+        fcfs_path = PIC_DIR / "fcfs.png"
+        if fcfs_path.exists():
+            image.alpha_composite(get_image(fcfs_path), (965, 265 + step_y * num))
+
+        fc_icon = play_bonus_icon(score.fc.value if score.fc else None)
+        if fc_icon is not None:
+            image.alpha_composite(fc_icon.resize((65, 65)), (960, 261 + step_y * num))
+
+        fs_icon = play_bonus_icon(score.fs.value if score.fs else None)
+        if fs_icon is not None:
+            image.alpha_composite(fs_icon.resize((65, 65)), (1025, 261 + step_y * num))
+
+        rank = rank_icon(score, width=100, height=45)
+        if rank is not None:
+            image.alpha_composite(rank, (737, 272 + step_y * num))
+
+        tb.draw(510, 292 + step_y * num, 42, f"{score.achievements:.4f}%", TEXT_COLOR, "lm")
+        tb.draw(915, 283 + step_y * num, 18, round(score.dx_rating), TEXT_COLOR, "mm")
+
+    footer_design(image, f"Designed by Yuri-YuzuChaN & BlueDeer233. Generated by {BOT_LABEL}", bottom=95, width=900)
+    return image
+
+
+def _draw_static_song_info(song: MaiSong) -> Image.Image:
+    image = get_image(PIC_DIR / "song_bg.png")
+    draw = ImageDraw.Draw(image)
+    tb = DrawText(draw, TBFONT)
+    sy = DrawText(draw, SIYUAN)
+
+    if (logo_path := PIC_DIR / "logo.png").exists():
+        image.alpha_composite(get_image(logo_path).resize((249, 120)), (65, 25))
+
+    cover = get_image(music_picture(song.id)).resize((280, 280))
+    image.alpha_composite(cover, (110, 180))
+
+    version_path = version_picture(song.version)
+    if version_path is not None:
+        image.alpha_composite(get_image(version_path).resize((182, 90)), (800, 370))
+
+    title = song.title
+    if coloum_width(title) > 40:
+        title = change_column_width(title, 39) + "..."
+    sy.draw(405, 220, 28, title, TEXT_COLOR, "lm")
+
+    artist = song.artist
+    if coloum_width(artist) > 50:
+        artist = change_column_width(artist, 49) + "..."
+    sy.draw(407, 265, 20, artist, TEXT_COLOR, "lm")
+    tb.draw(460, 330, 30, song.bpm, TEXT_COLOR, "lm")
+    tb.draw(405, 435, 28, f"ID {song.id}", TEXT_COLOR, "lm")
+    sy.draw(665, 435, 24, song.genre, TEXT_COLOR, "mm")
+
+    all_diffs = song.difficulties.standard if song.difficulties.standard else song.difficulties.dx
+    for num, diff in enumerate(all_diffs[:5]):
+        tb.draw(181, 610 + 73 * num, 30, f"{diff.level}({diff.level_value:.1f})", TITLE_COLORS[min(num, 4)], "mm")
+        tb.draw(315, 600 + 73 * num, 30, f"{diff.level_fit:.2f}" if diff.level_fit else "-", TEXT_COLOR, "mm")
+        notes = [diff.notes.tap, diff.notes.hold, diff.notes.slide, diff.notes.touch, diff.notes.break_]
+        tb.draw(437, 600 + 73 * num, 30, sum(notes), TEXT_COLOR, "mm")
+        for idx, value in enumerate(notes):
+            tb.draw(556 + 119 * idx, 600 + 73 * num, 30, value, TEXT_COLOR, "mm")
+        if num > 1:
+            charter = diff.note_designer
+            if coloum_width(charter) > 19:
+                charter = change_column_width(charter, 18) + "..."
+            sy.draw(372, 1030 + 47 * (num - 2), 18, charter, TEXT_COLOR, "mm")
+
+    footer_design(image, f"Designed by Yuri-YuzuChaN & BlueDeer233. Generated by {BOT_LABEL}", bottom=105, width=900)
+    return image
 
 
 def draw_music_info(song: MaiSong, scores: List[PlayerMaiScore]) -> Image.Image:
-    image = Image.new("RGBA", (1400, 920), (245, 248, 255, 255))
-    draw = ImageDraw.Draw(image)
-    sy = DrawText(draw, FONT_MAIN)
-    tb = DrawText(draw, FONT_NUM)
-
-    draw.rounded_rectangle((24, 24, 1376, 896), radius=36, fill=PANEL_BG, outline=PANEL_BORDER, width=3)
-    draw.rounded_rectangle((52, 52, 432, 432), radius=28, fill=(236, 241, 255, 255), outline=PANEL_BORDER, width=2)
-
-    cover = None
-    from ._config import COVER_DIR
-
-    for filename in _candidate_cover_paths(song.id):
-        path = COVER_DIR / filename
-        if path.exists():
-            cover = Image.open(path).convert("RGBA").resize((340, 340))
-            break
-    if cover is None:
-        cover = Image.new("RGBA", (340, 340), (239, 243, 255, 255))
-        cover_draw = ImageDraw.Draw(cover)
-        cover_draw.rounded_rectangle((0, 0, 339, 339), radius=24, fill=(239, 243, 255, 255), outline=PANEL_BORDER, width=3)
-        DrawText(cover_draw, FONT_NUM).draw(170, 170, 42, song.id, ACCENT_COLOR, "mm")
-    image.alpha_composite(cover, (72, 72))
-
-    title = song.title
-    if coloum_width(title) > 36:
-        title = change_column_width(title, 36) + "..."
-    sy.draw(470, 92, 34, title, TEXT_COLOR, "lm")
-    sy.draw(470, 138, 18, f"Artist: {song.artist}", SUBTEXT_COLOR, "lm")
-    sy.draw(470, 170, 18, f"Genre: {song.genre}", SUBTEXT_COLOR, "lm")
-    sy.draw(470, 202, 18, f"BPM: {song.bpm}", SUBTEXT_COLOR, "lm")
-    sy.draw(470, 234, 18, f"Version: {song.version}", SUBTEXT_COLOR, "lm")
-    tb.draw(470, 282, 20, f"Song ID {song.id}", ACCENT_COLOR, "lm")
-
-    song_type = scores[0].song_type.value if scores else "standard"
-    diffs = song.difficulties.dx if song_type == "dx" else song.difficulties.standard
-
-    sy.draw(72, 460, 24, "Difficulty / Score Details", TEXT_COLOR, "lm")
-
-    for index, diff in enumerate(diffs[:5]):
-        y = 508 + index * 72
-        score = next((item for item in scores if item.song_difficulty.value == index), None)
-        diff_color = DIFF_COLORS[index]
-
-        draw.rounded_rectangle((52, y, 1348, y + 56), radius=20, fill=(255, 255, 255, 220), outline=diff_color, width=2)
-        draw.rounded_rectangle((64, y + 8, 182, y + 48), radius=18, fill=diff_color)
-        sy.draw(123, y + 28, 18, f"Diff {index}", (255, 255, 255, 255), "mm")
-
-        tb.draw(214, y + 28, 20, diff.level_value, diff_color, "lm")
-        sy.draw(278, y + 28, 16, f"Level {diff.level}", SUBTEXT_COLOR, "lm")
-
-        notes_total = diff.notes.total if diff.notes else 0
-        sy.draw(426, y + 28, 16, f"Notes {notes_total}", SUBTEXT_COLOR, "lm")
-
-        if score:
-            rate_text = _score_rate_text(score)
-            fcfs = [rate_text]
-            if score.fc:
-                fcfs.append(score.fc.value.upper())
-            if score.fs:
-                fcfs.append(score.fs.value.upper())
-            status = " / ".join(fcfs)
-            tb.draw(590, y + 28, 19, f"{score.achievements:.4f}%", diff_color, "lm")
-            sy.draw(760, y + 28, 16, status, SUBTEXT_COLOR, "lm")
-            tb.draw(980, y + 28, 17, f"DX {score.dx_score}", SUBTEXT_COLOR, "lm")
-            tb.draw(1132, y + 28, 17, f"Ra {score.dx_rating}", ACCENT_COLOR, "lm")
-            if score.play_count:
-                sy.draw(1266, y + 28, 15, f"PC {score.play_count}", SUBTEXT_COLOR, "rm")
-        else:
-            sy.draw(590, y + 28, 18, "No record", SUBTEXT_COLOR, "lm")
-
-    sy.draw(
-        700,
-        862,
-        16,
-        "Generated by SuzunoBot with embedded Nonebot-Plugin-Rikka maimai implementation",
-        SUBTEXT_COLOR,
-        "mm",
-    )
-    return image
+    return _draw_player_song_info(song, scores) if scores else _draw_static_song_info(song)

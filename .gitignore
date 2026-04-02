@@ -5,3 +5,12 @@ static/
 .venv/
 __pycache__/
 .pytest_cache/
+database/*.db
+database/*.sqlite
+database/*.sqlite3
+database/*.sqlite-shm
+database/*.sqlite-wal
+database/*.sqlite3-shm
+database/*.sqlite3-wal
+database/*.journal
+!database/.gitkeep

@@ -7,12 +7,10 @@ from datetime import datetime
 from pathlib import Path
 
 from nonebot import logger
-from nonebot_plugin_alconna import UniMessage
-from nonebot_plugin_alconna.uniseg import At, Image
 from nonebot_plugin_orm import get_scoped_session
 
 from ..config import config
-from ..database import MaiSongORM
+from ..storage import MaiSongORM
 
 _activates = ["拼机", "推分", "下埋", "打新曲", "开随机段位", "打旧框"]
 
@@ -23,7 +21,7 @@ _TEMPLATE = """今日人品值: {luck_value}
 """
 
 
-async def generate_today_fortune(user_id: str) -> UniMessage:
+async def generate_today_fortune_parts(user_id: str) -> list[str | Path]:
     """
     生成用户的今日运势
     """
@@ -90,16 +88,13 @@ async def generate_today_fortune(user_id: str) -> UniMessage:
             )
             response_difficulties_content.append(f"拟合定数(DX): {fit_diffs}")
 
-    return UniMessage(
-        [
-            At(flag="user", target=user_id),
-            Image(path=song_cover),
-            _TEMPLATE.format(
-                luck_value=luck_value,
-                fortunate_activates=fortunate_activates,
-                title=lucky_song.title,
-                id=lucky_song.id,
-            ),
-            "\n".join(response_difficulties_content),
-        ]
-    )
+    return [
+        song_cover,
+        _TEMPLATE.format(
+            luck_value=luck_value,
+            fortunate_activates=fortunate_activates,
+            title=lucky_song.title,
+            id=lucky_song.id,
+        ),
+        "\n".join(response_difficulties_content),
+    ]

@@ -1,5 +1,5 @@
 from ..constants import _MAI_VERSION_MAP
-from ..database import MaiSongORM
+from ..storage import MaiSongORM
 from ..score import PlayerMaiB50, PlayerMaiScore
 
 

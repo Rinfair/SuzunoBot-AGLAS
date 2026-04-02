@@ -25,11 +25,12 @@ from maimai_py import (
 )
 from nonebot import logger
 from nonebot.internal.matcher import current_event
-from nonebot_plugin_alconna import At, UniMessage
+from nonebot_plugin_alconna import UniMessage
 from nonebot_plugin_orm import async_scoped_session, get_scoped_session
 
 from ...config import config
-from ...database import MaiPlayCountORM, UserBindInfo, UserBindInfoORM
+from ...storage import MaiPlayCountORM, UserBindInfo, UserBindInfoORM
+from ...utils import reply_user_segment
 from .._base import BaseScoreProvider
 from .._schema import (
     PlayerMaiB50,
@@ -55,6 +56,27 @@ _arcade_provider = ArcadeProvider(http_proxy=config.arcade_provider_http_proxy)
 class MaimaiPyParams:
     score_provider: _SUPPORT_PROVIDER
     identifier: PlayerIdentifier
+
+    @staticmethod
+    def _hash_identifier(identifier: PlayerIdentifier) -> int:
+        return hash(
+            (
+                identifier.qq,
+                identifier.friend_code,
+                identifier.username,
+                identifier.credentials,
+            )
+        )
+
+    def __hash__(self) -> int:
+        return hash((id(self.score_provider), self._hash_identifier(self.identifier)))
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, MaimaiPyParams):
+            return False
+        return id(self.score_provider) == id(other.score_provider) and self._hash_identifier(
+            self.identifier
+        ) == self._hash_identifier(other.identifier)
 
 
 class MaimaiPyScoreProvider(BaseScoreProvider[MaimaiPyParams]):
@@ -175,7 +197,7 @@ class MaimaiPyScoreProvider(BaseScoreProvider[MaimaiPyParams]):
 
                     await UniMessage(
                         [
-                            At(flag="user", target=user_id),
+                            reply_user_segment(user_id),
                             "你还未绑定查分器，请使用 /bind 指令进行绑定！",
                         ]
                     ).finish()
@@ -185,7 +207,7 @@ class MaimaiPyScoreProvider(BaseScoreProvider[MaimaiPyParams]):
                     logger.warning(f"[{user_id}] 无法通过 QQ 号请求玩家数据: QQ 号无效 & 非 QQ 平台聊天")
                     await UniMessage(
                         [
-                            At(flag="user", target=user_id),
+                            reply_user_segment(user_id),
                             "你还未绑定查分器，请使用 /bind 指令进行绑定！",
                         ]
                     ).finish()
@@ -197,7 +219,7 @@ class MaimaiPyScoreProvider(BaseScoreProvider[MaimaiPyParams]):
                 logger.warning(f"[{user_id}] 无法获取好友码，无法继续查询。")
                 await UniMessage(
                     [
-                        At(flag="user", target=user_id),
+                        reply_user_segment(user_id),
                         "无法获取好友码，请确认已绑定或查分器可用。",
                     ]
                 ).finish()
@@ -220,8 +242,14 @@ class MaimaiPyScoreProvider(BaseScoreProvider[MaimaiPyParams]):
 
     async def fetch_player_info(self, params: MaimaiPyParams) -> PlayerMaiInfo:
         player_info = await maimai_client.players(params.identifier, params.score_provider)
+        unpacked = self._unpack_player_mai_info(player_info)
+        if params.identifier.qq:
+            unpacked.qq = str(params.identifier.qq)
+        return unpacked
 
-        return self._unpack_player_mai_info(player_info)
+    @alru_cache(maxsize=128, ttl=10 * 60)
+    async def _fetch_maimai_scores(self, params: MaimaiPyParams) -> MaimaiScores:
+        return await maimai_client.scores(params.identifier, params.score_provider)
 
     async def fetch_player_b50(self, params: MaimaiPyParams) -> PlayerMaiB50:
         player_b50 = await maimai_client.bests(params.identifier, params.score_provider)
@@ -239,7 +267,7 @@ class MaimaiPyScoreProvider(BaseScoreProvider[MaimaiPyParams]):
         """
         logger.debug("1/2 获取完整游玩记录")
 
-        scores = await maimai_client.scores(params.identifier, params.score_provider)
+        scores = await self._fetch_maimai_scores(params)
 
         ap_records = scores.filter(fc=FCType.AP) + scores.filter(fc=FCType.APP)
 
@@ -316,6 +344,7 @@ class MaimaiPyScoreProvider(BaseScoreProvider[MaimaiPyParams]):
         self,
         params: MaimaiPyParams,
         level: Optional[str] = None,
+        level_value: Optional[float] = None,
         ach: Optional[float] = None,
         diff: Optional[Literal["BASIC", "ADVANCED", "EXPERT", "MASTER", "REMASTER"]] = None,
     ) -> list[PlayerMaiScore]:
@@ -326,6 +355,8 @@ class MaimaiPyScoreProvider(BaseScoreProvider[MaimaiPyParams]):
         :type params: MaimaiPyParams
         :param level: 曲目等级，如 `11`, `12+`
         :type level: str
+        :param level_value: 曲目等级值，如 `11.5`
+        :type level_value: float
         :param ach: 达成率，精确一位小数
         :type ach: float
         :param diff: 铺面难度分类
@@ -338,11 +369,13 @@ class MaimaiPyScoreProvider(BaseScoreProvider[MaimaiPyParams]):
         def trunc_1(x):
             return Decimal(str(x)).quantize(Decimal("0.0"), rounding=ROUND_DOWN)
 
-        scores = await maimai_client.scores(params.identifier, params.score_provider)
+        scores = await self._fetch_maimai_scores(params)
         matched_scores: list[ScoreExtend] = []
 
         if level:
             matched_scores = cast(list[ScoreExtend], scores.filter(level=level))
+        elif level_value:
+            matched_scores = cast(list[ScoreExtend], scores.filter(level_value=level_value))
         elif ach:
             for score in scores.scores:
                 if score.achievements and trunc_1(score.achievements) == trunc_1(ach):

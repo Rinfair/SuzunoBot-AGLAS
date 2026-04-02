@@ -198,6 +198,10 @@ class PlayerMaiInfo:
     """阶级 ID"""
     friend_code: Optional[str] = None
     """好友码"""
+    qq: Optional[str] = None
+    """QQ 号，用于头像回退"""
+    profile_plate: int = 1
+    """自定义顶部名片板编号"""
     trophy: Optional[PlayerTrophy] = None
     """称号"""
     icon: Optional[PlayerIcon] = None

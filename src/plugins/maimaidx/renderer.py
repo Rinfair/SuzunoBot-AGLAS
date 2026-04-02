@@ -2,10 +2,11 @@ from pathlib import Path
 from typing import Literal, Optional
 
 from nonebot import logger
+from nonebot.internal.matcher import current_event
 from nonebot_plugin_orm import get_scoped_session
 from typing_extensions import TypedDict
 
-from .database.crud import MaiSongORM
+from .storage import MaiSongORM, get_user_profile_plate
 from .models.song import MaiSong
 from .painters import DrawBest, DrawScores, draw_music_info, image_to_bytes
 from .score import PlayerMaiB50, PlayerMaiInfo, PlayerMaiScore
@@ -36,6 +37,23 @@ class PicRenderer:
 
         self.draw_best = DrawBest()
         self.draw_score = DrawScores()
+
+    @staticmethod
+    async def _fill_profile_identity(player_info: PlayerMaiInfo) -> None:
+        try:
+            event = current_event.get()
+        except LookupError:
+            return
+
+        user_id = event.get_user_id()
+        if not player_info.qq and user_id.isdigit():
+            player_info.qq = user_id
+        session = get_scoped_session()
+        try:
+            player_info.profile_plate = await get_user_profile_plate(session, user_id)
+        except Exception as exc:
+            logger.warning(f"读取用户 {user_id} 的自定义名片板失败，回退到 plate_1: {exc}")
+            player_info.profile_plate = 1
 
     @staticmethod
     def _cover_candidates(base_dir: Path, song_id: int) -> list[Path]:
@@ -158,6 +176,8 @@ class PicRenderer:
                     score.song_id, score.song_type.value, score.song_difficulty.value  # type: ignore
                 )
 
+        await self._fill_profile_identity(player_info)
+
         # Ensure player assets
         await self._validate_profile_resources(player_info)
 
@@ -171,6 +191,8 @@ class PicRenderer:
         """
         渲染玩家具体成绩图
         """
+        await self._fill_profile_identity(player_info)
+
         # Ensure player assets
         await self._validate_profile_resources(player_info)
 
@@ -181,7 +203,7 @@ class PicRenderer:
                 score.song_id, score.song_type.value, score.song_difficulty.value  # type: ignore
             )
 
-        img = self.draw_score.draw_scorelist(player_info, scores, title or "Player Scores")
+        img = self.draw_score.draw_scorelist(player_info, scores, title or "成绩列表")
         return image_to_bytes(img)
 
     async def render_mai_player_song_info(self, song: MaiSong, scores: list[PlayerMaiScore]) -> bytes:

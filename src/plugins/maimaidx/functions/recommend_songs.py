@@ -9,7 +9,7 @@ from typing import Literal, Optional, cast
 from nonebot import logger
 
 from ..constants import _MAI_VERSION_MAP
-from ..database.crud import MaiSongORM
+from ..storage import MaiSongORM
 from ..models.song import MaiSong, SongDifficulty
 from ..score import PlayerMaiScore
 from .analysis import get_player_strength
@@ -38,7 +38,7 @@ class RecommendSongs:
     new_version: list[RecommendSong]
 
 
-def _get_song_level_value(song_id: int, song_type: Literal["standard", "dx", "utage"], difficulty: int) -> float:
+def _get_song_level_value(song_id: int, song_type: Literal["standard", "dx", "utage"], difficulty: int) -> Optional[float]:
     """
     获取乐曲定数
 
@@ -54,7 +54,8 @@ def _get_song_level_value(song_id: int, song_type: Literal["standard", "dx", "ut
     song_info = MaiSongORM.get_song_sync(song_id)
 
     if not song_info:
-        raise ValueError(f"请求的乐曲 {song_id}({song_type}) 不存在")
+        logger.warning(f"推荐算法跳过未命中本地曲库的成绩: {song_id}({song_type})")
+        return None
 
     if song_type == "dx" and len(song_info.difficulties.dx) > difficulty:
         return song_info.difficulties.dx[difficulty].level_value
@@ -63,7 +64,8 @@ def _get_song_level_value(song_id: int, song_type: Literal["standard", "dx", "ut
     elif song_type == "utage":
         return 0
 
-    raise ValueError(f"请求的乐曲 {song_id}({song_type}) 中的难度 {difficulty} 不存在")
+    logger.warning(f"推荐算法跳过缺少难度数据的成绩: {song_id}({song_type}) difficulty={difficulty}")
+    return None
 
 
 def get_player_raise_score_songs(
@@ -82,12 +84,20 @@ def get_player_raise_score_songs(
 
     # 获取 B100 乐曲平均定数
     total_level_value = 0.0
+    total_level_value_count = 0
     for score in scores[:100]:
         score.song_level_value = _get_song_level_value(
             score.song_id, score.song_type.value, score.song_difficulty.value
-        )
+        ) or score.song_level_value
+        if score.song_level_value is None:
+            continue
         total_level_value += score.song_level_value
-    average_level_value = total_level_value / 100.0
+        total_level_value_count += 1
+
+    if total_level_value_count == 0:
+        raise ValueError("玩家成绩缺少可用定数数据，无法进行上分曲目推荐")
+
+    average_level_value = total_level_value / total_level_value_count
 
     # 计算推荐定数范围
     min_level_value = max(average_level_value - 0.3, 4.0)
@@ -130,7 +140,10 @@ def get_player_raise_score_songs(
 
     # 筛选模式: 0: 不过滤; 1: 过滤诈称铺; 2: 只输出水铺
     if filter_mode is None:
-        filter_mode = 2 if len(total_recommended_songs) > 500 else (1 if len(total_recommended_songs) > 200 else 0)
+        if not SONG_TAGS_DATA_AVAILABLE:
+            filter_mode = 0
+        else:
+            filter_mode = 2 if len(total_recommended_songs) > 500 else (1 if len(total_recommended_songs) > 200 else 0)
     logger.debug(f"共找到 {len(total_recommended_songs)} 待定推分曲目, 筛选模式: {filter_mode}")
 
     # 筛选推荐曲目
@@ -163,13 +176,17 @@ def get_player_raise_score_songs(
         )
 
         # 按筛选模式筛选
-        if filter_mode >= 2 and "水" not in get_songs_tags(song.title, song_type, song_difficulty):
+        if SONG_TAGS_DATA_AVAILABLE and filter_mode >= 2 and "水" not in get_songs_tags(
+            song.title, song_type, song_difficulty
+        ):
             continue
 
-        elif filter_mode >= 1 and "诈称谱" in get_songs_tags(song.title, song_type, song_difficulty):
+        elif SONG_TAGS_DATA_AVAILABLE and filter_mode >= 1 and "诈称谱" in get_songs_tags(
+            song.title, song_type, song_difficulty
+        ):
             continue
 
-        elif difficulty.level_value - difficulty.level_fit > 0.3:
+        elif difficulty.level_fit is not None and difficulty.level_value - difficulty.level_fit > 0.3:
             continue
 
         # 如果该曲目达成了更高的达成率之后仍然未加分就剔除

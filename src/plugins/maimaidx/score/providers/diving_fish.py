@@ -5,7 +5,7 @@ from nonebot import logger
 from nonebot_plugin_orm import get_scoped_session
 
 from ...constants import _MAI_VERSION_MAP
-from ...database import MaiSongORM
+from ...storage import MaiSongORM
 from .._base import BaseScoreProvider
 from .._schema import (
     PlayerMaiB50,
@@ -100,7 +100,7 @@ class DivingFishScoreProvider(BaseScoreProvider[DivingFishParams]):
             raise ValueError("必须提供 username 或 qq")
 
         data: DivingFishBest50Response = await self._post_resp(endpoint, req_params)
-        return PlayerMaiInfo(data["nickname"], data["rating"], 0, 0)
+        return PlayerMaiInfo(data["nickname"], data["rating"], 0, 0, qq=params.qq)
 
     async def fetch_player_b50(self, params: DivingFishParams) -> PlayerMaiB50:
         """

@@ -3,14 +3,17 @@ import sys
 import time
 from contextvars import ContextVar
 from importlib.metadata import PackageNotFoundError, version
+from typing import Any
 
 from nonebot import logger
 from nonebot.adapters import Event
+from nonebot.internal.matcher import current_event
 from nonebot.log import default_filter, logger_id
+from nonebot_plugin_alconna import At
 from nonebot_plugin_orm import async_scoped_session
 
 from .config import config
-from .database import MaiSongORM
+from .storage import MaiSongORM
 from .models.song import MaiSong
 
 event_context: ContextVar[Event] = ContextVar("event")
@@ -160,3 +163,17 @@ def set_ctx(event: Event):
     注册 Nonebot 中的上下文信息
     """
     event_context.set(event)
+
+
+def reply_user_segment(user_id: str) -> Any:
+    """
+    群聊中返回 @ 用户段，私聊中返回空字符串，避免私聊发送 At 失败。
+    """
+    try:
+        event = current_event.get()
+    except LookupError:
+        return ""
+
+    if getattr(event, "message_type", None) == "group":
+        return At(flag="user", target=user_id)
+    return ""

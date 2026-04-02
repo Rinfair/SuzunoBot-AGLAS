@@ -11,9 +11,9 @@ from arclet.alconna import Alconna, AllParam, Args
 from maimai_py import LXNSProvider
 from nonebot import get_driver, logger
 from nonebot.adapters import Event
+from nonebot.internal.matcher import current_bot, current_event
 from nonebot.exception import FinishedException
 from nonebot.params import Depends
-from nonebot.rule import to_me
 from nonebot_plugin_alconna import (
     AlconnaMatch,
     At,
@@ -24,11 +24,18 @@ from nonebot_plugin_alconna import (
     on_alconna,
 )
 from nonebot_plugin_alconna.uniseg import Image as UniImage
-from nonebot_plugin_orm import async_scoped_session
+from nonebot_plugin_orm import async_scoped_session, get_scoped_session
 
 from .config import config
 from .constants import _MAI_VERSION_MAP
-from .database import MaiPlayCountORM, MaiSongAliasORM, MaiSongORM, UserBindInfoORM
+from .storage import (
+    MaiPlayCountORM,
+    MaiSongAliasORM,
+    MaiSongORM,
+    UserBindInfoORM,
+    get_user_profile_plate,
+    set_user_profile_plate,
+)
 from .extra_proxy import (
     get_maistatus,
     run_divingfish_import_workflow,
@@ -38,7 +45,7 @@ from .extra_proxy import (
     run_unlock_workflow,
 )
 from .functions.analysis import get_player_strength
-from .functions.fortunate import generate_today_fortune
+from .functions.fortunate import generate_today_fortune_parts
 from .functions.maistatus import capture_maimai_status_png
 from .functions.n50 import get_players_n50
 from .functions.process import (
@@ -67,12 +74,59 @@ from .score import (
 )
 from .score.providers.maimai import MaimaiPyParams
 from .updater.songs import update_song_alias_list
-from .utils import get_song_by_id_or_alias, is_float
+from .utils import get_song_by_id_or_alias, is_float, reply_user_segment
 
 renderer = PicRenderer()
 
+ReplyPart = str | bytes | Path
 
-def _build_song_info_message(user_id: str, song: MaiSong) -> UniMessage:
+
+def At(*, flag: str, target: str):
+    return reply_user_segment(target)
+
+
+async def finish_reply(user_id: str, parts: list[ReplyPart]) -> None:
+    normalized_parts = [part for part in parts if not (isinstance(part, str) and not part)]
+    try:
+        bot = current_bot.get()
+        event = current_event.get()
+    except LookupError:
+        bot = None
+        event = None
+
+    if bot is not None and event is not None and bot.adapter.get_name() == "OneBot V11":
+        from nonebot.adapters.onebot.v11 import Message, MessageSegment
+
+        message = Message()
+        if getattr(event, "message_type", None) == "group":
+            message += MessageSegment.at(user_id)
+
+        for part in normalized_parts:
+            if isinstance(part, bytes):
+                message += MessageSegment.image(part)
+            elif isinstance(part, Path):
+                message += MessageSegment.image(part.resolve())
+            else:
+                message += MessageSegment.text(part)
+
+        await bot.send(event, message)
+        raise FinishedException
+
+    segments: list[object] = []
+    mention = reply_user_segment(user_id)
+    if mention:
+        segments.append(mention)
+    for part in normalized_parts:
+        if isinstance(part, bytes):
+            segments.append(UniImage(raw=part))
+        elif isinstance(part, Path):
+            segments.append(UniImage(path=part))
+        else:
+            segments.append(part)
+    await UniMessage(segments).finish()
+
+
+def _build_song_info_message(user_id: str, song: MaiSong) -> list[ReplyPart]:
     """Reuseable builder for song info replies."""
 
     cover_dir = Path(config.static_resource_path) / "mai" / "cover"
@@ -141,21 +195,18 @@ def _build_song_info_message(user_id: str, song: MaiSong) -> UniMessage:
             if song_tags_content:
                 response_difficulties_content.append("铺面标签(DX): " + "; ".join(song_tags_content))
 
-    return UniMessage(
-        [
-            At(flag="user", target=user_id),
-            UniImage(path=song_cover),
-            _MAI_SONG_INFO_TEMPLATE.format(
-                title=song.title,
-                id=song.id,
-                artist=song.artist,
-                genre=song.genre,
-                bpm=song.bpm,
-                version=_MAI_VERSION_MAP.get(song.version // 100, "未知版本"),
-            ),
-            "\n".join(response_difficulties_content),
-        ]
-    )
+    return [
+        song_cover,
+        _MAI_SONG_INFO_TEMPLATE.format(
+            title=song.title,
+            id=song.id,
+            artist=song.artist,
+            genre=song.genre,
+            bpm=song.bpm,
+            version=_MAI_VERSION_MAP.get(song.version // 100, "未知版本"),
+        ),
+        "\n".join(response_difficulties_content),
+    ]
 
 
 def catch_exception(reply_prefix: str = "发生了未知错误", reply_error: bool = True):
@@ -176,7 +227,7 @@ def catch_exception(reply_prefix: str = "发生了未知错误", reply_error: bo
     return decorator
 
 
-COMMAND_PREFIXES = [".", "/"]
+COMMAND_PREFIXES = ["", ".", "/"]
 
 _MAI_SONG_INFO_TEMPLATE = """[舞萌DX] 乐曲信息
 {title}({id})
@@ -196,7 +247,6 @@ alconna_help = on_alconna(
     ),
     priority=50,
     block=False,
-    rule=to_me(),
 )
 
 alconna_bind = on_alconna(
@@ -213,7 +263,6 @@ alconna_bind = on_alconna(
     priority=10,
     block=True,
     skip_for_unmatch=False,
-    rule=to_me(),
 )
 
 alconna_import = on_alconna(
@@ -226,7 +275,6 @@ alconna_import = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_ticket = on_alconna(
@@ -238,7 +286,6 @@ alconna_ticket = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_logout = on_alconna(
@@ -250,7 +297,6 @@ alconna_logout = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_unlock = on_alconna(
@@ -262,7 +308,6 @@ alconna_unlock = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_unbind = on_alconna(
@@ -274,7 +319,6 @@ alconna_unbind = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_source = on_alconna(
@@ -287,28 +331,35 @@ alconna_source = on_alconna(
     priority=10,
     block=True,
     aliases={"provider"},
-    rule=to_me(),
+)
+
+alconna_plate = on_alconna(
+    Alconna(
+        COMMAND_PREFIXES,
+        "plate",
+        Args["number", int],
+        meta=CommandMeta("[舞萌DX]设置顶部名片板", usage=".plate <number>"),
+    ),
+    priority=10,
+    block=True,
 )
 
 alconna_b50 = on_alconna(
     Alconna(COMMAND_PREFIXES, "b50", meta=CommandMeta("[舞萌DX]生成玩家 Best 50")),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_ap50 = on_alconna(
     Alconna(COMMAND_PREFIXES, "ap50", meta=CommandMeta("[舞萌DX]生成玩家 ALL PERFECT 50")),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_r50 = on_alconna(
     Alconna(COMMAND_PREFIXES, "r50", meta=CommandMeta("[舞萌DX]生成玩家 Recent 50 (需绑定落雪查分器)")),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_pc50 = on_alconna(
@@ -317,14 +368,12 @@ alconna_pc50 = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_n50 = on_alconna(
     Alconna(COMMAND_PREFIXES, "n50", meta=CommandMeta("[舞萌DX]生成玩家基于拟合系数的 Top-50")),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_minfo = on_alconna(
@@ -336,7 +385,6 @@ alconna_minfo = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_random = on_alconna(
@@ -349,7 +397,6 @@ alconna_random = on_alconna(
     aliases={"随机乐曲", "随"},
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_alias = on_alconna(
@@ -366,7 +413,6 @@ alconna_alias = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_score = on_alconna(
@@ -378,7 +424,6 @@ alconna_score = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_scorelist = on_alconna(
@@ -393,13 +438,13 @@ alconna_scorelist = on_alconna(
     aliases={"scoreslist"},
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_plate_process = on_alconna(
     Alconna(
         COMMAND_PREFIXES,
-        r"re:([真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉舞霸熊華华爽煌星宙祭祝双宴镜彩])([極极将舞神者]舞?)进度\s?(.+)?",
+        r"re:[真超檄橙暁晓桃櫻樱紫菫堇白雪輝辉舞霸熊華华爽煌星宙祭祝双宴镜彩][極极将舞神者]舞?进度\S*",
+        Args["rest?", AllParam(str)],
         meta=CommandMeta(
             "[舞萌DX]牌子进度",
             usage=".真极进度 / .熊将进度 难 / .紫舞舞进度",
@@ -407,13 +452,13 @@ alconna_plate_process = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_level_process = on_alconna(
     Alconna(
         COMMAND_PREFIXES,
-        r"re:([0-9]+\+?)\s?([abcdsfxp\+]+)\s?([\u4e00-\u9fa5]+)?进度\s?([0-9]+)?\s?(.+)?",
+        r"re:[0-9]+\+?\S*",
+        Args["rest?", AllParam(str)],
         meta=CommandMeta(
             "[舞萌DX]等级进度",
             usage=".13+ sss 进度 / .14 ap 进度",
@@ -421,7 +466,6 @@ alconna_level_process = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_update = on_alconna(
@@ -435,7 +479,6 @@ alconna_update = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_fortune = on_alconna(
@@ -447,7 +490,6 @@ alconna_fortune = on_alconna(
     aliases={"今日舞萌"},
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_analysis = on_alconna(
@@ -459,7 +501,6 @@ alconna_analysis = on_alconna(
     aliases={"底力分析", "成分分析"},
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_trend = on_alconna(
@@ -470,7 +511,6 @@ alconna_trend = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_recommend = on_alconna(
@@ -482,7 +522,6 @@ alconna_recommend = on_alconna(
     aliases={"什么推分", "推分", "推分推荐"},
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_maistatus = on_alconna(
@@ -494,7 +533,6 @@ alconna_maistatus = on_alconna(
     aliases={"舞萌状态"},
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 alconna_rikka = on_alconna(
@@ -505,7 +543,6 @@ alconna_rikka = on_alconna(
     ),
     priority=10,
     block=True,
-    rule=to_me(),
 )
 
 
@@ -518,6 +555,7 @@ async def handle_help(event: Event):
         ".bind <查分器名称> <API密钥> 绑定查分器账号\n"
         ".unbind <查分器名称> 解绑游戏账号/查分器\n"
         ".source <查分器名称> 设置默认查分器\n"
+        ".plate <number> 设置顶部名片板\n"
         ".b50 获取玩家 Best 50\n"
         ".ap50 获取玩家 ALL PERFECT 50\n"
         ".r50 获取玩家 Recent 50 (需绑定落雪查分器)\n"
@@ -915,6 +953,28 @@ async def handle_source(
     ).finish()
 
 
+@alconna_plate.handle()
+@catch_exception()
+async def handle_plate(event: Event, number: Match[int] = AlconnaMatch("number")):
+    user_id = event.get_user_id()
+    session = get_scoped_session()
+
+    if not number.available or number.result <= 0:
+        await UniMessage([At(flag="user", target=user_id), "请输入有效的名片板编号，例如 .plate 1"]).finish()
+        return
+
+    plate_path = Path(config.static_resource_path) / "mai" / "pic" / f"plate_{number.result}.png"
+    if not plate_path.exists():
+        current = await get_user_profile_plate(session, user_id)
+        await UniMessage(
+            [At(flag="user", target=user_id), f"未找到名片板 plate_{number.result}.png，当前名片板编号为 {current}"]
+        ).finish()
+        return
+
+    await set_user_profile_plate(session, user_id, number.result)
+    await finish_reply(user_id, [f"已将顶部名片板设置为 plate_{number.result}.png", plate_path])
+
+
 @alconna_b50.handle()
 @catch_exception()
 async def handle_mai_b50(
@@ -940,7 +1000,7 @@ async def handle_mai_b50(
     logger.debug(f"[{user_id}] 4/4 渲染玩家数据...")
     pic = await renderer.render_mai_player_best50(player_b50, player_info)
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=pic)]).finish()
+    await finish_reply(user_id, [pic])
 
 
 @alconna_ap50.handle()
@@ -977,7 +1037,7 @@ async def handle_mai_ap50(
     logger.debug(f"[{user_id}] 4/4 渲染玩家数据...")
     pic = await renderer.render_mai_player_best50(player_ap50, player_info)
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=pic)]).finish()
+    await finish_reply(user_id, [pic])
 
 
 @alconna_r50.handle()
@@ -1031,7 +1091,7 @@ async def handle_mai_r50(
     logger.debug(f"[{user_id}] 4/4 渲染玩家数据...")
     pic = await renderer.render_mai_player_scores(player_r50, player_info, title="Recent 50")
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=pic)]).finish()
+    await finish_reply(user_id, [pic])
 
 
 @alconna_pc50.handle()
@@ -1077,7 +1137,7 @@ async def handle_pc50(
     logger.debug(f"[{user_id}] 4/4 渲染玩家数据...")
     pic = await renderer.render_mai_player_best50(player_scores, player_info)
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=pic)]).finish()
+    await finish_reply(user_id, [pic])
 
 
 @alconna_n50.handle()
@@ -1117,7 +1177,7 @@ async def handle_n50(
     logger.debug(f"[{user_id}] 5/5 渲染玩家数据...")
     pic = await renderer.render_mai_player_best50(player_n50, player_info, calc_song_level_value=False)
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=pic)]).finish()
+    await finish_reply(user_id, [pic])
 
 
 @alconna_minfo.handle()
@@ -1143,9 +1203,7 @@ async def handle_minfo(
         return
 
     logger.debug(f"[{user_id}] 2/2 构建乐曲信息模板...")
-    response_content = _build_song_info_message(user_id, song)
-
-    await response_content.finish()
+    await finish_reply(user_id, _build_song_info_message(user_id, song))
 
 
 @alconna_random.handle()
@@ -1238,9 +1296,7 @@ async def handle_random(
         return
 
     song = choice(filtered_songs)
-    response = _build_song_info_message(user_id, song)
-
-    await response.finish()
+    await finish_reply(user_id, _build_song_info_message(user_id, song))
 
 
 @alconna_alias.assign("update")
@@ -1417,7 +1473,7 @@ async def handle_score(
     logger.debug(f"[{user_id}] 5/5 渲染玩家数据...")
     pic = await renderer.render_mai_player_song_info(song, scores)
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=pic)]).finish()
+    await finish_reply(user_id, [pic])
 
 
 @alconna_scorelist.handle()
@@ -1492,7 +1548,7 @@ async def handle_scorelist(
     logger.debug(f"[{user_id}] 4/4 渲染玩家数据...")
     pic = await renderer.render_mai_player_scores(scores[:50], player_info, title)
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=pic)]).finish()
+    await finish_reply(user_id, [pic])
 
 
 @alconna_plate_process.handle()
@@ -1550,7 +1606,7 @@ async def handle_plate_process(
 
     logger.debug(f"[{user_id}] 3/3 渲染玩家数据...")
     img = ProcessPainter(data).draw_plate(use_difficult=use_difficult)
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=img.getvalue())]).finish()
+    await finish_reply(user_id, [img.getvalue()])
 
 
 @alconna_level_process.handle()
@@ -1601,7 +1657,7 @@ async def handle_level_process(
 
     logger.debug(f"[{user_id}] 3/3 渲染玩家数据...")
     img = ProcessPainter(data).draw_level()
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=img.getvalue())]).finish()
+    await finish_reply(user_id, [img.getvalue()])
 
 
 @alconna_update.assign("songs")
@@ -1662,9 +1718,7 @@ async def handle_fortune(
 
     logger.info(f"[{user_id}] 获取今日舞萌运势")
 
-    fortune_message = await generate_today_fortune(user_id)
-
-    await fortune_message.finish()
+    await finish_reply(user_id, await generate_today_fortune_parts(user_id))
 
 
 @alconna_analysis.handle()
@@ -1713,7 +1767,7 @@ async def handle_analysis(
     pic = draw_player_strength_analysis(player_strength)
     byte = image_to_bytes(pic)
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=byte)]).finish()
+    await finish_reply(user_id, [byte])
 
 
 @alconna_trend.handle()
@@ -1776,7 +1830,7 @@ async def handle_trend(
     pic = draw_player_rating_trend(trends)
     byte = image_to_bytes(pic)
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=byte)]).finish()
+    await finish_reply(user_id, [byte])
 
 
 @alconna_recommend.handle()
@@ -1818,7 +1872,7 @@ async def handle_recommend(
     pic = DrawScores().draw_rise(recommend_songs, round(min_dx_score))
     byte = image_to_bytes(pic)
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=byte)]).finish()
+    await finish_reply(user_id, [byte])
 
 
 @alconna_maistatus.handle()
@@ -1847,7 +1901,7 @@ async def handle_maistatus(event: Event):
         await UniMessage([At(flag="user", target=user_id), f"状态页截图渲染失败：{e}"]).finish()
         return
 
-    await UniMessage([At(flag="user", target=user_id), UniImage(raw=png), render_time_message]).finish()
+    await finish_reply(user_id, [png, render_time_message])
 
 
 @alconna_rikka.handle()

@@ -1,9 +1,4 @@
-"""
-绘图模块
-提供生成 Best 50、成绩列表、单曲详情等图片的功能
-
-参考自: - maimaidx_draw (https://github.com/Yuri-YuzuChaN/nonebot-plugin-maimaidx)
-"""
+"""maimaidx 图片渲染模块。"""
 
 from .analysis import draw_player_strength_analysis
 from .b50 import DrawBest

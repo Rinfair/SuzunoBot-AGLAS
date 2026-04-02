@@ -12,7 +12,7 @@ from typing_extensions import TypedDict
 
 from ..config import config
 from ..constants import USER_AGENT
-from ..database import MaiSongORM
+from ..storage import MaiSongORM
 from ..models.song import MaiSong, SongDifficulties
 
 _BASE_SONG_QUERY_URL = "https://maimai.lxns.net/api/v0/maimai/song/{song_id}"
@@ -112,7 +112,7 @@ async def _update_song_fit_diff(difficulties: SongDifficulties, song_id: int):
             difficulty.level_fit = get_song_fit_diff_from_local(song_id + 10000, index)
     except ValueError:
         if _music_chart_updated:
-            logger.error(f"曲目 {song_id} 的拟合定数获取失败，跳过该曲目拟合定数设置")
+            logger.warning(f"曲目 {song_id} 的拟合定数缺失，已跳过拟合定数设置并回退到原始定数")
             return
 
         logger.warning(f"曲目 {song_id} 的拟合定数获取失败，尝试更新本地 chart 文件")
@@ -124,7 +124,7 @@ async def _update_song_fit_diff(difficulties: SongDifficulties, song_id: int):
             for index, difficulty in enumerate(difficulties.dx):
                 difficulty.level_fit = get_song_fit_diff_from_local(song_id + 10000, index)
         except ValueError:
-            logger.error(f"曲目 {song_id} 的拟合定数获取失败，跳过该曲目拟合定数设置")
+            logger.warning(f"曲目 {song_id} 的拟合定数缺失，已跳过拟合定数设置并回退到原始定数")
 
 
 async def fetch_song_info(song_id: int, interval: float = 0.3) -> MaiSong:
@@ -173,7 +173,7 @@ async def update_song_alias_list(db_session: async_scoped_session):
             resp.raise_for_status()
             content: LXNSApiAliasResponse = await resp.json()
 
-    from ..database import MaiSongAliasORM
+    from ..storage import MaiSongAliasORM
 
     await MaiSongAliasORM.add_alias_batch(db_session, content["aliases"])
 

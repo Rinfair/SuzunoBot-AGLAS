@@ -94,6 +94,8 @@ class LXNSScoreProvider(BaseScoreProvider[LXNSParams]):
 
         valid_keys = {f.name for f in fields(PlayerMaiInfo)}
         filtered = {k: v for k, v in unpacked_info.items() if k in valid_keys}
+        if raw_info.get("qq"):
+            filtered["qq"] = str(raw_info["qq"])
 
         return PlayerMaiInfo(**filtered)
 
@@ -124,6 +126,8 @@ class LXNSScoreProvider(BaseScoreProvider[LXNSParams]):
 
         data = await self._get_resp(endpoint, self._developer_api_key)
         player_info = self._info_unpack(data["data"])
+        if params.qq and not player_info.qq:
+            player_info.qq = params.qq
         return player_info
 
     async def fetch_player_info_by_user_token(self, auth_token: str) -> PlayerMaiInfo:
@@ -138,6 +142,7 @@ class LXNSScoreProvider(BaseScoreProvider[LXNSParams]):
 
         data = await self._get_resp(endpoint, self._developer_api_key)
         player_info = self._info_unpack(data["data"])
+        player_info.qq = qq
         return player_info
 
     async def fetch_player_b50(self, params: LXNSParams) -> PlayerMaiB50:

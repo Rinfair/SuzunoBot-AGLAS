@@ -83,7 +83,7 @@ def get_all_score_providers() -> Dict[str, BaseScoreProvider]:
 async def auto_get_score_provider(user_id: str) -> LXNSScoreProvider | DivingFishScoreProvider:
     from nonebot_plugin_orm import get_scoped_session
 
-    from ..database.crud import UserBindInfoORM
+    from ..storage import UserBindInfoORM
 
     session = get_scoped_session()
     bind_info = await UserBindInfoORM.get_user_bind_info(session, user_id)
