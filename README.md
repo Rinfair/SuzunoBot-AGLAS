@@ -8,6 +8,7 @@
 - 图片渲染统一使用 `maimaiDX` 资源与布局方案。
 - 数据库存储统一到单文件 [`src/plugins/maimaidx/storage.py`](src/plugins/maimaidx/storage.py)。
 - 顶部名片板默认使用 `plate_1.png`，未设置或读取失败时自动回退到 `plate_1.png`。
+- `.maistatus` 的文本服务器状态检测依赖可选插件 `nonebot-plugin-rikka-extra`；未安装时会跳过文本状态，只返回状态页截图。
 - 运行数据库固定在仓库根目录 [`database/`](database/) 下，便于管理和重置。
 
 完整结构、指令、配置项、排障和代码来源见 [`docs/maimaidx.md`](docs/maimaidx.md)。

@@ -14,3 +14,4 @@ database/*.sqlite3-shm
 database/*.sqlite3-wal
 database/*.journal
 !database/.gitkeep
+.env

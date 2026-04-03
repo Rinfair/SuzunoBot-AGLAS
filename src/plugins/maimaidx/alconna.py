@@ -37,6 +37,7 @@ from .storage import (
     set_user_profile_plate,
 )
 from .extra_proxy import (
+    ExtraNotInstalledError,
     get_maistatus,
     run_divingfish_import_workflow,
     run_extend_score_workflow,
@@ -1879,16 +1880,24 @@ async def handle_recommend(
 @catch_exception(reply_prefix="获取舞萌状态失败")
 async def handle_maistatus(event: Event):
     user_id = event.get_user_id()
+    status_text: str | None = None
+    status_error: str | None = None
 
     logger.debug("正在获取舞萌服务器状态...")
     try:
         status_text = await get_maistatus()
+    except ExtraNotInstalledError as e:
+        logger.warning(f"舞萌文本状态检测不可用，已跳过文本状态输出: {e}")
+        status_error = str(e)
     except Exception as e:
-        status_text = f"服务器状态检测失败：{e}"
-
-    await UniMessage([At(flag="user", target=user_id), status_text]).send()
+        status_error = f"服务器状态检测失败：{e}"
+        await UniMessage([At(flag="user", target=user_id), status_error]).send()
+    else:
+        await UniMessage([At(flag="user", target=user_id), status_text]).send()
 
     if not config.maistatus_url:
+        if status_text is None and status_error is not None:
+            await UniMessage([At(flag="user", target=user_id), status_error]).finish()
         return
 
     logger.debug("正在尝试获取舞萌状态截图...")
@@ -1898,6 +1907,9 @@ async def handle_maistatus(event: Event):
         et = perf_counter()
         render_time_message = f"渲染用时 {et - st:.2f} 秒"
     except Exception as e:
+        if status_text is None and status_error is not None:
+            await UniMessage([At(flag="user", target=user_id), f"{status_error}\n状态页截图渲染失败：{e}"]).finish()
+            return
         await UniMessage([At(flag="user", target=user_id), f"状态页截图渲染失败：{e}"]).finish()
         return
 

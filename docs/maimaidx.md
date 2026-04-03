@@ -166,7 +166,7 @@
 | `成分分析` | `.analysis` | 成分分析 |
 | `推分推荐` | `.recommend` | 推分推荐 |
 | `今日舞萌` | `今日舞萌` | 今日运势 |
-| `舞萌状态` | `舞萌状态` | 状态页截图 |
+| `舞萌状态` | `舞萌状态` | 状态页截图；若安装 `nonebot-plugin-rikka-extra`，还会附带文本服务器状态 |
 
 ### 5.6 导入与维护
 
@@ -251,6 +251,8 @@
 
 - 先执行 `python -m playwright install chromium`
 - 检查 `maistatus_url` 是否可访问
+- `nonebot-plugin-rikka-extra` 仅用于文本服务器状态检测，不是截图返回的必需依赖
+- 未安装该插件时，`.maistatus` / `舞萌状态` 不会再先发送“未安装 nonebot-plugin-rikka-extra”，而是直接返回状态页截图
 
 ### 7.6 数据库异常
 

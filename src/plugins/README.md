@@ -14,6 +14,7 @@
   - [`renderer.py`](./maimaidx/renderer.py)：渲染服务入口
   - [`painters/`](./maimaidx/painters)：图片绘制实现
   - 顶部名片板默认使用 `plate_1.png`
+  - `.maistatus` 的文本服务器状态检测依赖可选插件 `nonebot-plugin-rikka-extra`，未安装时仍可返回状态页截图
   - 旧 `commands/` 包和旧 `database/` 子包已移除，不再参与运行时加载
 
 ## 扩展约定
