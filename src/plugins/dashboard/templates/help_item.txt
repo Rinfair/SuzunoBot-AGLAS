@@ -1,0 +1,3 @@
+- {trigger}
+  用法: {usage}
+  说明: {summary}{aliases_line}{notes_line}

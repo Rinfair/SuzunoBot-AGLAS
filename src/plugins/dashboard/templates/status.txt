@@ -1,0 +1,13 @@
+[{project_name}] 主机负载
+时间: {now}
+主机: {hostname}
+Bot 运行: {bot_uptime}
+系统运行: {system_uptime}
+CPU: {cpu_percent}% ({cpu_count} logical cores)
+内存: {memory_used} / {memory_total} ({memory_percent}%)
+磁盘[{disk_path}]: {disk_used} / {disk_total} ({disk_percent}%)
+进程内存: {process_rss} ({process_memory_percent}%)
+线程数: {thread_count}
+句柄数: {handle_count}
+PID: {pid}
+负载均值: {load_average}

@@ -240,16 +240,6 @@ BPM: {bpm}
 
 _DIFFICULTY_VALUE_MAP = {"BASIC": 0, "ADVANCED": 1, "EXPERT": 2, "MASTER": 3, "REMASTER": 4, "RE:MASTER": 4}
 
-alconna_help = on_alconna(
-    Alconna(
-        COMMAND_PREFIXES,
-        "help",
-        meta=CommandMeta("显示帮助信息", usage=".help"),
-    ),
-    priority=50,
-    block=False,
-)
-
 alconna_bind = on_alconna(
     Alconna(
         COMMAND_PREFIXES,
@@ -535,58 +525,6 @@ alconna_maistatus = on_alconna(
     priority=10,
     block=True,
 )
-
-alconna_rikka = on_alconna(
-    Alconna(
-        COMMAND_PREFIXES,
-        "rikka",
-        meta=CommandMeta("输出 Rikka 插件信息"),
-    ),
-    priority=10,
-    block=True,
-)
-
-
-@alconna_help.handle()
-async def handle_help(event: Event):
-    user_id = event.get_user_id()
-
-    help_text = (
-        "Rikka 查分器帮助:\n"
-        ".bind <查分器名称> <API密钥> 绑定查分器账号\n"
-        ".unbind <查分器名称> 解绑游戏账号/查分器\n"
-        ".source <查分器名称> 设置默认查分器\n"
-        ".plate <number> 设置顶部名片板\n"
-        ".b50 获取玩家 Best 50\n"
-        ".ap50 获取玩家 ALL PERFECT 50\n"
-        ".r50 获取玩家 Recent 50 (需绑定落雪查分器)\n"
-        ".n50 获取玩家拟合系数 Top-50\n"
-        f".pc50 生成玩家游玩次数 Top50 （{'当前不可用' if not config.enable_arcade_provider else '需通过 `.import` 导入游戏成绩'})\n"
-        ".random 随机获取一首乐曲（可选难度、等级、定数）\n"
-        ".minfo <乐曲ID/别名> 获取乐曲信息\n"
-        ".alias 管理乐曲别名（添加、查询、更新）\n"
-        ".score <乐曲ID/别名> 获取单曲游玩情况\n"
-        ".scorelist <level|ach|diff> 获取指定条件的成绩列表\n"
-        ".update songs 更新乐曲信息数据库\n"
-        ".update alias 更新乐曲别名列表\n"
-        ".trend 获取玩家的 DX Rating 趋势 （需绑定落雪查分器）\n"
-        f".成分分析 根据 B100 获取玩家成分分析 {'(当前不可用)' if not SONG_TAGS_DATA_AVAILABLE else ''}\n"
-        ".今日舞萌 获取今日出勤运势\n"
-        ".舞萌状态 检测服务器状态\n"
-        f".推分推荐 生成随机推分曲目 {'(当前不可用)' if not SONG_TAGS_DATA_AVAILABLE else ''}\n"
-        f".import [divingfish] <qr_code> 导入游玩次数或同步到水鱼 {'当前不可用' if not config.enable_arcade_provider else ''}\n"
-        f".ticket <qr_code> 发送六倍票 {'当前不可用' if not config.enable_arcade_provider else ''}\n"
-        f".logout <qr_code> 尝试强制登出 {'当前不可用' if not config.enable_arcade_provider else ''}\n"
-        f".unlock <qr_code> 解锁新框紫铺 {'当前不可用' if not config.enable_arcade_provider else ''}\n"
-    )
-
-    await UniMessage(
-        [
-            At(flag="user", target=user_id),
-            help_text,
-        ]
-    ).finish()
-
 
 @alconna_bind.assign("lxns")
 @catch_exception("尝试连接到落雪服务器时遇到错误")
@@ -1916,22 +1854,3 @@ async def handle_maistatus(event: Event):
     await finish_reply(user_id, [png, render_time_message])
 
 
-@alconna_rikka.handle()
-async def handle_rikka(db_session: async_scoped_session, event: Event):
-    from .utils import get_version
-
-    version = get_version()
-    total_songs_count = len(await MaiSongORM.get_all_song_ids(db_session))
-
-    message = (
-        "Rikka 插件信息\n"
-        f"插件版本: {version}\n"
-        f"Bot 乐曲数量: {total_songs_count}\n"
-        f"机台源支持: {'已启用' if config.enable_arcade_provider else '未启用'}\n"
-        f"标签数据: {'已启用' if SONG_TAGS_DATA_AVAILABLE else '未启用'}\n"
-        f"状态页支持: {'已启用' if config.maistatus_url else '未启用'}\n"
-    )
-
-    await UniMessage(message).send()
-
-    await handle_help(event)

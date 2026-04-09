@@ -2,7 +2,6 @@ import os
 import sys
 import time
 from contextvars import ContextVar
-from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
 from nonebot import logger
@@ -52,46 +51,6 @@ def init_logger():
     # 如果遇到其他日志处理器已处理，则跳过
     except ValueError:
         logger.debug("日志处理器已存在，跳过初始化")
-
-
-def get_version() -> str:
-    """
-    获取当前版本号
-
-    优先尝试从已安装包中获取版本号, 否则从 `pyproject.toml` 读取
-    """
-    package_name = "suzunobot-embedded-maimaidx"
-
-    try:
-        return version(package_name)
-    except PackageNotFoundError:
-        pass
-
-    toml_path = os.path.join(os.path.dirname(__file__), "../pyproject.toml")
-
-    if not os.path.isfile(toml_path):
-        return "embedded-rikka"
-
-    try:
-        if sys.version_info >= (3, 11):
-            import tomllib
-
-            with open(toml_path, "rb") as f:
-                pyproject_data = tomllib.load(f)
-
-        else:
-            import toml
-
-            with open(toml_path, "r", encoding="utf-8") as f:
-                pyproject_data = toml.load(f)
-
-        # 返回版本号
-        return pyproject_data["tool"]["pdm"]["version"]
-
-    except (FileNotFoundError, KeyError, ModuleNotFoundError):
-        return "embedded-rikka"
-
-
 def is_float(s: str) -> bool:
     try:
         float(s)

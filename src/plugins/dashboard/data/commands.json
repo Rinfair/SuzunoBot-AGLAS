@@ -1,0 +1,237 @@
+{
+  "sections": [
+    {
+      "plugin": "dashboard",
+      "title": "通用模块",
+      "commands": [
+        {
+          "trigger": "help / 帮助",
+          "usage": ".help",
+          "aliases": "帮助 / 菜单 / 命令帮助",
+          "summary": "查看当前机器人主要功能、触发器和用法总览"
+        },
+        {
+          "trigger": "项目信息",
+          "usage": ".项目信息",
+          "aliases": "about / info / botinfo / 关于 / 版本",
+          "summary": "查看项目名称、版本、作者、运行环境和当前加载情况"
+        },
+        {
+          "trigger": "系统状态",
+          "usage": ".系统状态",
+          "aliases": "status / 主机负载 / bot状态",
+          "summary": "查看主机 CPU、内存、磁盘、进程占用和运行时长"
+        },
+        {
+          "trigger": "插件列表",
+          "usage": ".插件列表",
+          "aliases": "plugins / 模块列表",
+          "summary": "查看当前已加载的插件与适配器"
+        },
+        {
+          "trigger": "ping",
+          "usage": ".ping",
+          "aliases": "存活 / 在线检测",
+          "summary": "快速检查机器人存活状态与本地处理耗时"
+        }
+      ]
+    },
+    {
+      "plugin": "maimaidx",
+      "title": "舞萌 DX / 账号与查分",
+      "commands": [
+        {
+          "trigger": "bind",
+          "usage": ".bind lxns <token> / .bind divingfish <token>",
+          "aliases": ".bind help",
+          "summary": "绑定落雪或水鱼查分器账号"
+        },
+        {
+          "trigger": "unbind",
+          "usage": ".unbind <all|lxns|divingfish|maimai>",
+          "summary": "解绑查分器账号或机台标识"
+        },
+        {
+          "trigger": "source",
+          "usage": ".source <lxns|divingfish>",
+          "aliases": "provider",
+          "summary": "设置默认查分器"
+        },
+        {
+          "trigger": "plate",
+          "usage": ".plate <number>",
+          "summary": "设置顶部名片板"
+        },
+        {
+          "trigger": "b50",
+          "usage": ".b50",
+          "summary": "生成玩家 Best 50"
+        },
+        {
+          "trigger": "ap50",
+          "usage": ".ap50",
+          "summary": "生成玩家 ALL PERFECT 50"
+        },
+        {
+          "trigger": "r50",
+          "usage": ".r50",
+          "summary": "生成玩家 Recent 50",
+          "notes": "需要绑定落雪查分器"
+        },
+        {
+          "trigger": "pc50",
+          "usage": ".pc50",
+          "summary": "生成玩家游玩次数 Top-50",
+          "notes": "需要机台源与 .import 导入成绩。{arcade_provider_note}"
+        },
+        {
+          "trigger": "n50",
+          "usage": ".n50",
+          "summary": "生成玩家拟合系数 Top-50"
+        },
+        {
+          "trigger": "trend",
+          "usage": ".trend",
+          "summary": "生成玩家 DX Rating 趋势图",
+          "notes": "需要绑定落雪查分器"
+        }
+      ]
+    },
+    {
+      "plugin": "maimaidx",
+      "title": "舞萌 DX / 乐曲与分析",
+      "commands": [
+        {
+          "trigger": "minfo",
+          "usage": ".minfo <id|别名>",
+          "summary": "查询乐曲信息"
+        },
+        {
+          "trigger": "random",
+          "usage": ".random [难度] [等级|定数]",
+          "aliases": "随机乐曲 / 随",
+          "summary": "按条件随机抽取乐曲"
+        },
+        {
+          "trigger": "alias",
+          "usage": ".alias add <乐曲ID> <别名> / .alias query <id|别名> / .alias update",
+          "aliases": ".alias help",
+          "summary": "管理和查询乐曲别名"
+        },
+        {
+          "trigger": "score",
+          "usage": ".score <id|别名>",
+          "summary": "查看单曲游玩情况"
+        },
+        {
+          "trigger": "scorelist",
+          "usage": ".scorelist <level|ach|diff>",
+          "aliases": "scoreslist",
+          "summary": "按等级、达成率或难度筛选成绩列表"
+        },
+        {
+          "trigger": "<牌子>进度",
+          "usage": ".真极进度 / .熊将进度 难 / .紫舞舞进度",
+          "summary": "查询牌子进度"
+        },
+        {
+          "trigger": "<等级> 进度",
+          "usage": ".13+ sss 进度 / .14 ap 进度",
+          "summary": "查询等级进度"
+        },
+        {
+          "trigger": "fortune",
+          "usage": ".fortune",
+          "aliases": "今日舞萌",
+          "summary": "获取今日上机运势"
+        },
+        {
+          "trigger": "analysis",
+          "usage": ".analysis",
+          "aliases": "底力分析 / 成分分析",
+          "summary": "根据 B100 获取玩家成分分析",
+          "notes": "{song_tags_note}"
+        },
+        {
+          "trigger": "recommend",
+          "usage": ".recommend",
+          "aliases": "什么推分 / 推分 / 推分推荐",
+          "summary": "生成随机推分曲目",
+          "notes": "{song_tags_note}"
+        },
+        {
+          "trigger": "maistatus",
+          "usage": ".maistatus",
+          "aliases": "舞萌状态",
+          "summary": "检测服务器状态并可渲染状态页截图",
+          "notes": "{status_page_note}"
+        }
+      ]
+    },
+    {
+      "plugin": "maimaidx",
+      "title": "舞萌 DX / 机台与维护",
+      "commands": [
+        {
+          "trigger": "update",
+          "usage": ".update songs / .update alias / .update chart",
+          "summary": "更新本地乐曲信息、别名或 chart 文件"
+        },
+        {
+          "trigger": "import",
+          "usage": ".import [divingfish] <qr_code>",
+          "summary": "导入游玩次数或同步成绩到查分器",
+          "notes": "{arcade_provider_note}"
+        },
+        {
+          "trigger": "ticket",
+          "usage": ".ticket <qr_code>",
+          "summary": "发送六倍票",
+          "notes": "{arcade_provider_note}"
+        },
+        {
+          "trigger": "logout",
+          "usage": ".logout <qr_code>",
+          "summary": "尝试强制登出",
+          "notes": "{arcade_provider_note}"
+        },
+        {
+          "trigger": "unlock",
+          "usage": ".unlock <qr_code>",
+          "summary": "解锁新框紫铺",
+          "notes": "{arcade_provider_note}"
+        }
+      ]
+    },
+    {
+      "plugin": "batarot",
+      "title": "BA Tarot",
+      "commands": [
+        {
+          "trigger": "ba塔罗牌",
+          "usage": "ba塔罗牌",
+          "aliases": "batarot / tarot / 塔罗牌",
+          "summary": "随机抽取一张塔罗牌并返回正逆位含义"
+        },
+        {
+          "trigger": "ba占卜",
+          "usage": "ba占卜",
+          "aliases": "divination / 占卜",
+          "summary": "随机抽取牌阵并给出每张牌的解释"
+        },
+        {
+          "trigger": "ba运势",
+          "usage": "ba运势",
+          "aliases": "fortune / 运势",
+          "summary": "随机生成今日塔罗牌与运势解读"
+        },
+        {
+          "trigger": "ba塔罗牌解读",
+          "usage": "ba塔罗牌解读 <编号或中文名>",
+          "aliases": "reading / 塔罗牌解读",
+          "summary": "返回指定塔罗牌的原作者解读"
+        }
+      ]
+    }
+  ]
+}

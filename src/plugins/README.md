@@ -6,7 +6,9 @@
 
 ## 当前插件结构
 
+- [`dashboard`](./dashboard) 是当前内嵌的项目级通用模块，负责帮助、项目信息与系统状态。
 - [`maimaidx`](./maimaidx) 是当前内嵌的舞萌主插件。
+- [`batarot`](./batarot) 是当前内嵌的碧蓝档案塔罗牌独立插件。
 - 运行数据库位于仓库根目录 [`database/`](../../database/)，不放在插件目录内部。
 - `maimaidx` 内部当前采用：
   - [`alconna.py`](./maimaidx/alconna.py)：单文件根指令入口
@@ -24,14 +26,17 @@
 - 目录插件：`src/plugins/<plugin_name>/__init__.py`
 - 单文件插件：`src/plugins/<plugin_name>.py`
 
+当前新增插件时，优先使用仓库内命名，不直接沿用 `nonebot_plugin_*` 这类外部包目录名。
+
 通常不需要修改 [`bot.py`](../../bot.py)。
 
 如果继续扩展 `maimaidx`：
 
 1. 根指令优先继续维护在 [`src/plugins/maimaidx/alconna.py`](./maimaidx/alconna.py)。
-2. 只有在明确存在高复用逻辑时，再额外抽取模块。
-3. 用户可自定义信息优先放到 [`storage.py`](./maimaidx/storage.py)，不要再新增本地 json。
-4. 图片渲染统一走 [`painters/render_core.py`](./maimaidx/painters/render_core.py) 这套 maimaiDX 风格资源与布局。
+2. 项目级帮助、项目信息和系统状态统一放到 [`dashboard`](./dashboard)，不要再塞回业务插件。
+3. 只有在明确存在高复用逻辑时，再额外抽取模块。
+4. 用户可自定义信息优先放到 [`storage.py`](./maimaidx/storage.py)，不要再新增本地 json。
+5. 图片渲染统一走 [`painters/render_core.py`](./maimaidx/painters/render_core.py) 这套 maimaiDX 风格资源与布局。
 
 ## 代码来源说明
 

@@ -1,0 +1,6 @@
+[{project_name}] 存活检查
+状态: online
+时间: {now}
+Bot 运行: {bot_uptime}
+PID: {pid}
+本地处理耗时: {process_ms} ms

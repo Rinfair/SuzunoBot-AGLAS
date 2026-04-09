@@ -1,0 +1,6 @@
+[{project_name}] 命令帮助
+支持前缀: {command_start}
+已加载插件: {plugin_count}
+说明: 已启用AGLAS AutoMover Tools，中文命令通常可直接无前缀触发。
+
+{sections}

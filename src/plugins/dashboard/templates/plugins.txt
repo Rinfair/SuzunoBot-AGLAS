@@ -1,0 +1,5 @@
+[{project_name}] 插件列表
+适配器: {adapters}
+插件总数: {plugin_count}
+
+{plugin_lines}

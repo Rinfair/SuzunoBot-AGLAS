@@ -36,7 +36,7 @@ async def initialize_song_cache():
 __plugin_meta__ = PluginMetadata(
     name="SuzunoBot Embedded Maimai",
     description="SuzunoBot-AGLAS 舞萌插件，命令逻辑整理自 Rikka，图片渲染基于 maimaiDX 资源方案",
-    usage=".rikka",
+    usage=".b50",
     type="application",
     config=Config,
     homepage="https://github.com/Yuri-YuzuChaN/maimaiDX",

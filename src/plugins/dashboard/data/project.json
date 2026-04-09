@@ -1,0 +1,10 @@
+{
+  "name": "SuzunoBot-AGLAS",
+  "description": "基于 NoneBot2 的 SuzunoBot 本地插件项目",
+  "authors": [
+    "Rinfair-CSP-A016"
+  ],
+  "repository": "https://github.com/Rinfair-CSP-A016/SuzunoBot-AGLAS",
+  "homepage": "https://github.com/Rinfair-CSP-A016/SuzunoBot-AGLAS",
+  "version_fallback": "v2.0.1b-0.95"
+}

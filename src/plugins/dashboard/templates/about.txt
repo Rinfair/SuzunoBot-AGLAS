@@ -1,0 +1,19 @@
+[{project_name}] 项目信息
+描述: {project_description}
+版本: {project_version}
+分支: {project_branch}
+提交: {project_commit}
+作者: {project_authors}
+仓库: {project_repository}
+主页: {project_homepage}
+运行环境: {environment}
+命令前缀: {command_start}
+Bot 昵称: {nicknames}
+适配器: {adapters}
+已加载插件: {plugin_count}
+Python: {python_version}
+系统: {platform}
+主机: {hostname}
+启动时间: {boot_time}
+运行时长: {bot_uptime}
+工作目录: {cwd}
