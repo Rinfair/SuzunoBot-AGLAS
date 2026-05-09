@@ -55,7 +55,13 @@ from .functions.process import (
     get_plate_process_data,
 )
 from .functions.recommend_songs import get_player_raise_score_songs
-from .functions.song_tags import SONG_TAGS_DATA_AVAILABLE, get_songs_tags
+from .functions.song_tags import (
+    SONG_TAGS_DATA_AVAILABLE,
+    download_song_tags_data,
+    get_song_tags_file_path,
+    get_song_tags_load_error,
+    get_songs_tags,
+)
 from .models.song import MaiSong
 from .painters import (
     DrawScores,
@@ -466,6 +472,7 @@ alconna_update = on_alconna(
         Subcommand("songs", help_text=".update songs 更新乐曲信息数据库"),
         Subcommand("alias", help_text=".update alias 更新乐曲别名列表"),
         Subcommand("chart", help_text=".update chart 更新 music_chart.json 文件"),
+        Subcommand("tags", help_text=".update tags 更新 DXRating 乐曲标签数据"),
         meta=CommandMeta("[舞萌DX]更新乐曲信息或别名列表"),
     ),
     priority=10,
@@ -1649,6 +1656,29 @@ async def handle_update_chart(event: Event):
     ).finish()
 
 
+@alconna_update.assign("tags")
+@catch_exception("更新乐曲标签失败")
+async def handle_update_tags(event: Event):
+    user_id = event.get_user_id()
+    nb_config = get_driver().config
+
+    if user_id not in nb_config.superusers:
+        await UniMessage("更新乐曲标签需要管理员权限哦").finish()
+
+    data = await download_song_tags_data()
+    await UniMessage(
+        [
+            At(flag="user", target=user_id),
+            (
+                "乐曲标签数据已更新完成 ⭐\n"
+                f"保存位置: {get_song_tags_file_path()}\n"
+                f"标签数: {len(data.get('tags', []))}\n"
+                f"关联谱面数: {len(data.get('tagSongs', []))}"
+            ),
+        ]
+    ).finish()
+
+
 @alconna_fortune.handle()
 async def handle_fortune(
     event: Event,
@@ -1670,10 +1700,16 @@ async def handle_analysis(
     user_id = event.get_user_id()
 
     if not SONG_TAGS_DATA_AVAILABLE:
+        tag_path = get_song_tags_file_path()
+        load_error = get_song_tags_load_error()
         await UniMessage(
             [
                 At(flag="user", target=user_id),
-                "管理员未配置乐曲标签，无法使用此功能喵",
+                (
+                    "管理员未配置乐曲标签，无法使用此功能喵\n"
+                    f"请管理员执行 .update tags，或从 DXRating 获取 combined_tags.json 后放入 {tag_path}"
+                    + (f"\n当前加载状态: {load_error}" if load_error else "")
+                ),
             ]
         ).finish()
         return
